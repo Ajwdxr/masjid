@@ -3,18 +3,18 @@
 import { Card } from "./Card";
 
 interface StatsCardProps {
-  label: string;
+  title: string;
   value: string | number;
   icon: string;
-  change?: string;
+  subtitle?: string;
   variant?: "gold" | "emerald" | "default";
 }
 
 export function StatsCard({
-  label,
+  title,
   value,
   icon,
-  change,
+  subtitle,
   variant = "default",
 }: StatsCardProps) {
   const accentColor =
@@ -29,13 +29,13 @@ export function StatsCard({
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs text-light-muted font-medium uppercase tracking-wider">
-            {label}
+            {title}
           </p>
           <p className={`text-2xl font-bold font-[family-name:var(--font-poppins)] mt-1 ${accentColor}`}>
             {value}
           </p>
-          {change && (
-            <p className="text-xs text-emerald-light mt-1">{change}</p>
+          {subtitle && (
+            <p className="text-xs text-emerald-light mt-1">{subtitle}</p>
           )}
         </div>
         <span className="text-2xl opacity-50">{icon}</span>
