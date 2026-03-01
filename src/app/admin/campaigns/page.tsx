@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { IconWallet, IconEdit, IconTrash, IconPlus } from "@/components/ui/Icons";
 import type { Campaign, CampaignFormData } from "@/types/campaign";
 import { formatCurrency, calcPercentage, formatShortDate } from "@/lib/utils";
 
@@ -112,8 +113,9 @@ export default function AdminCampaignsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold font-[family-name:var(--font-poppins)] gold-text">
-            💰 Urus Kempen
+          <h1 className="text-2xl font-bold font-[family-name:var(--font-poppins)] gold-text flex items-center gap-2">
+            <IconWallet size={24} className="text-gold" />
+            Urus Kempen
           </h1>
           <p className="text-light-muted text-sm mt-1">
             {campaigns.length} kempen
@@ -127,7 +129,7 @@ export default function AdminCampaignsPage() {
               setShowForm(true);
             }}
           >
-            + Tambah
+            <IconPlus size={16} className="inline mr-1" /> Tambah
           </Button>
         )}
       </div>
@@ -332,14 +334,14 @@ export default function AdminCampaignsPage() {
                     size="sm"
                     onClick={() => handleEdit(campaign)}
                   >
-                    ✏️
+                    <IconEdit size={14} />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(campaign.id)}
                   >
-                    🗑️
+                    <IconTrash size={14} />
                   </Button>
                 </div>
               </div>

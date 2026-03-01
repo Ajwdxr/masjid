@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import type { Announcement } from "@/types/announcement";
 import { formatShortDate, truncate } from "@/lib/utils";
+import { IconMegaphone, IconCalendar } from "@/components/ui/Icons";
 
 interface AnnouncementCardProps {
   announcement: Announcement;
@@ -25,8 +26,8 @@ export function AnnouncementCard({
             />
           </div>
         ) : (
-          <div className="shrink-0 w-16 h-16 rounded-lg bg-gold/10 flex items-center justify-center">
-            <span className="text-2xl">📢</span>
+          <div className="shrink-0 w-16 h-16 rounded-lg bg-gold/10 flex items-center justify-center border border-gold/20">
+            <IconMegaphone size={24} className="text-gold/60" />
           </div>
         )}
 

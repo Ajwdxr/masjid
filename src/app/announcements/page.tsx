@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AnnouncementList } from "@/components/announcements/AnnouncementList";
+import { IconMegaphone } from "@/components/ui/Icons";
 import type { Announcement } from "@/types/announcement";
 
 export const metadata: Metadata = {
@@ -76,8 +77,9 @@ export default function AnnouncementsPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold font-[family-name:var(--font-poppins)] gold-text">
-          📢 Pengumuman
+        <h1 className="text-2xl md:text-3xl font-bold font-[family-name:var(--font-poppins)] gold-text flex items-center gap-3">
+          <IconMegaphone size={28} className="text-gold" />
+          Pengumuman
         </h1>
         <p className="text-light-muted text-sm mt-2">
           Senarai pengumuman terkini dari Masjid Zahir, Alor Setar.

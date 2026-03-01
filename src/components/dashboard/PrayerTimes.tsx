@@ -2,19 +2,27 @@
 
 import type { PrayerTime as PrayerTimeType } from "@/types/prayer";
 import { usePrayerCountdown } from "@/hooks/usePrayerTimes";
+import {
+  IconMoon,
+  IconSunrise,
+  IconSun,
+  IconCloudSun,
+  IconCloud,
+  IconSunset,
+} from "@/components/ui/Icons";
 
 interface PrayerTimesProps {
   prayers: PrayerTimeType[];
 }
 
-const prayerIcons: Record<string, string> = {
-  Imsak: "🌑",
-  Fajr: "🌅",
-  Syuruk: "☀️",
-  Dhuhr: "🌤️",
-  Asr: "⛅",
-  Maghrib: "🌇",
-  Isha: "🌙",
+const prayerIcons: Record<string, React.ReactNode> = {
+  Imsak: <IconMoon size={22} />,
+  Fajr: <IconSunrise size={22} />,
+  Syuruk: <IconSun size={22} />,
+  Dhuhr: <IconCloudSun size={22} />,
+  Asr: <IconCloud size={22} />,
+  Maghrib: <IconSunset size={22} />,
+  Isha: <IconMoon size={22} />,
 };
 
 export function PrayerTimes({ prayers }: PrayerTimesProps) {
@@ -61,9 +69,13 @@ export function PrayerTimes({ prayers }: PrayerTimesProps) {
                   </span>
                 </div>
               )}
-              <span className="text-lg block mb-1">
-                {prayerIcons[prayer.name] || "🕌"}
-              </span>
+              <div
+                className={`flex justify-center mb-1 ${
+                  isNext ? "text-gold" : "text-light-muted"
+                }`}
+              >
+                {prayerIcons[prayer.name]}
+              </div>
               <p
                 className={`text-xs font-medium mb-0.5 ${
                   isNext ? "text-gold" : "text-light-muted"

@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { IconCreditCard } from "@/components/ui/Icons";
 import type { Campaign } from "@/types/campaign";
 import { formatCurrency, calcPercentage, formatShortDate } from "@/lib/utils";
 import Link from "next/link";
@@ -29,7 +30,9 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
               {campaign.title}
             </h3>
           </div>
-          <span className="text-3xl">💰</span>
+          <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center border border-gold/20">
+            <IconCreditCard size={20} className="text-gold" />
+          </div>
         </div>
 
         {/* Description */}
@@ -67,7 +70,8 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         {/* CTA */}
         <Link href="/infaq">
           <Button variant="primary" className="w-full animate-pulse-gold">
-            💳 Derma Sekarang
+            <IconCreditCard size={16} className="inline mr-2" />
+            Derma Sekarang
           </Button>
         </Link>
       </div>

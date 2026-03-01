@@ -3,13 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import {
+  IconHome,
+  IconMegaphone,
+  IconWallet,
+  IconClipboard,
+  IconGrid,
+  IconTv,
+} from "@/components/ui/Icons";
 
 const navLinks = [
-  { href: "/", label: "Utama", icon: "🏠" },
-  { href: "/announcements", label: "Pengumuman", icon: "📢" },
-  { href: "/infaq", label: "Infaq", icon: "💰" },
-  { href: "/aduan", label: "Aduan", icon: "📝" },
-  { href: "/admin", label: "Admin", icon: "⚙️" },
+  { href: "/", label: "Utama", icon: <IconHome size={16} /> },
+  { href: "/announcements", label: "Pengumuman", icon: <IconMegaphone size={16} /> },
+  { href: "/infaq", label: "Infaq", icon: <IconWallet size={16} /> },
+  { href: "/aduan", label: "Aduan", icon: <IconClipboard size={16} /> },
+  { href: "/admin", label: "Admin", icon: <IconGrid size={16} /> },
 ];
 
 export function Navbar() {
@@ -58,16 +66,17 @@ export function Navbar() {
             })}
             <Link
               href="/tv"
-              className="ml-2 px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium text-emerald-light border border-emerald/30 hover:bg-emerald/10 transition-all duration-200"
+              className="ml-2 px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium text-emerald-light border border-emerald/30 hover:bg-emerald/10 transition-all duration-200 flex items-center gap-1.5"
             >
-              📺 TV
+              <IconTv size={14} />
+              TV
             </Link>
           </nav>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-dark-surface transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-dark-surface transition-colors cursor-pointer"
             aria-label="Toggle menu"
           >
             <div className="w-5 h-5 flex flex-col justify-center gap-1">
@@ -106,7 +115,7 @@ export function Navbar() {
                       : "text-light-muted hover:text-light hover:bg-dark-surface"
                   }`}
                 >
-                  <span>{link.icon}</span>
+                  {link.icon}
                   {link.label}
                 </Link>
               );
@@ -116,7 +125,7 @@ export function Navbar() {
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium text-emerald-light hover:bg-emerald/10 transition-all"
             >
-              <span>📺</span>
+              <IconTv size={16} />
               TV Display
             </Link>
           </div>

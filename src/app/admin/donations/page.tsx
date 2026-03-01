@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { IconCreditCard, IconUser, IconUserX } from "@/components/ui/Icons";
 import type { Donation } from "@/types/donation";
 import { formatCurrency } from "@/lib/utils";
 
@@ -28,7 +29,8 @@ export default function AdminDonationsPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold font-[family-name:var(--font-poppins)] gold-text">
-          🧾 Senarai Derma
+          <IconCreditCard size={24} className="text-gold" />
+          Senarai Derma
         </h1>
         <p className="text-light-muted text-sm mt-1">
           {donations.length} rekod &middot; Jumlah: {formatCurrency(totalAmount)}
@@ -67,7 +69,7 @@ export default function AdminDonationsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className="text-sm">
-                        {donation.donor_name ? "👤" : "🙈"}
+                        {donation.donor_name ? <IconUser size={16} className="text-gold" /> : <IconUserX size={16} className="text-light-muted" />}
                       </span>
                       <span className="text-light text-sm">
                         {donation.donor_name || "Tanpa Nama"}

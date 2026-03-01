@@ -8,6 +8,7 @@ import { PrayerTimes } from "@/components/dashboard/PrayerTimes";
 import { AnnouncementCard } from "@/components/dashboard/AnnouncementCard";
 import { CampaignCard } from "@/components/dashboard/CampaignCard";
 import { fetchPrayerTimes } from "@/lib/prayer-times";
+import { IconMosque, IconMegaphone, IconWallet, IconClipboard } from "@/components/ui/Icons";
 import type { Announcement } from "@/types/announcement";
 import type { Campaign } from "@/types/campaign";
 
@@ -91,7 +92,8 @@ export default async function HomePage() {
         <Card>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold font-[family-name:var(--font-poppins)] gold-text flex items-center gap-2">
-              🕌 Waktu Solat
+              <IconMosque size={20} className="text-gold" />
+              Waktu Solat
             </h2>
             <Badge variant="muted">{prayerData.zone}</Badge>
           </div>
@@ -103,7 +105,8 @@ export default async function HomePage() {
       <section className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold font-[family-name:var(--font-poppins)] text-light flex items-center gap-2">
-            📢 Pengumuman Terkini
+            <IconMegaphone size={18} className="text-gold" />
+            Pengumuman Terkini
           </h2>
           <Link
             href="/announcements"
@@ -126,7 +129,8 @@ export default async function HomePage() {
       {/* ─── Active Campaign ─── */}
       <section className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
         <h2 className="text-lg font-semibold font-[family-name:var(--font-poppins)] text-light flex items-center gap-2 mb-4">
-          💰 Kempen Infaq Aktif
+          <IconWallet size={18} className="text-gold" />
+          Kempen Infaq Aktif
         </h2>
         <CampaignCard campaign={mockCampaign} />
       </section>
@@ -138,7 +142,8 @@ export default async function HomePage() {
       >
         <Link href="/aduan">
           <Button variant="outline" size="lg">
-            📝 Hantar Aduan
+            <IconClipboard size={16} className="inline mr-2" />
+            Hantar Aduan
           </Button>
         </Link>
       </section>

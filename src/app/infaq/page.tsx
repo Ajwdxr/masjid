@@ -5,6 +5,7 @@ import { CampaignDisplay } from "@/components/infaq/CampaignDisplay";
 import { DonationForm } from "@/components/infaq/DonationForm";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { IconWallet, IconCreditCard, IconUser, IconUserX } from "@/components/ui/Icons";
 import type { Campaign } from "@/types/campaign";
 import type { Donation, DonationFormData } from "@/types/donation";
 import { formatCurrency } from "@/lib/utils";
@@ -75,8 +76,9 @@ export default function InfaqPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       {/* Header */}
       <div className="animate-fade-in">
-        <h1 className="text-2xl md:text-3xl font-bold font-[family-name:var(--font-poppins)] gold-text">
-          💰 Infaq & Derma
+        <h1 className="text-2xl md:text-3xl font-bold font-[family-name:var(--font-poppins)] gold-text flex items-center gap-3">
+          <IconWallet size={28} className="text-gold" />
+          Infaq & Derma
         </h1>
         <p className="text-light-muted text-sm mt-2">
           Menyumbang untuk kemajuan dan penyelenggaraan Masjid Zahir.
@@ -102,16 +104,17 @@ export default function InfaqPage() {
 
       {/* Recent Donations */}
       <section className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
-        <h2 className="text-lg font-semibold font-[family-name:var(--font-poppins)] text-light mb-4">
-          🧾 Sumbangan Terkini
+        <h2 className="text-lg font-semibold font-[family-name:var(--font-poppins)] text-light mb-4 flex items-center gap-2">
+          <IconCreditCard size={18} className="text-gold" />
+          Sumbangan Terkini
         </h2>
         <div className="space-y-2">
           {donations.slice(0, 10).map((donation, i) => (
             <Card key={donation.id} className="p-4" hover={false}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center text-sm">
-                    {donation.donor_name ? "👤" : "🙈"}
+                  <div className="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center">
+                    {donation.donor_name ? <IconUser size={16} className="text-gold" /> : <IconUserX size={16} className="text-light-muted" />}
                   </div>
                   <div>
                     <p className="text-sm font-medium text-light">

@@ -5,7 +5,7 @@ import { Card } from "./Card";
 interface StatsCardProps {
   title: string;
   value: string | number;
-  icon: string;
+  icon: React.ReactNode;
   subtitle?: string;
   variant?: "gold" | "emerald" | "default";
 }

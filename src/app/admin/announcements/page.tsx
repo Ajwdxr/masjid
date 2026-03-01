@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { AnnouncementForm } from "@/components/announcements/AnnouncementForm";
+import { IconMegaphone, IconEdit, IconTrash, IconPlus, IconCalendar } from "@/components/ui/Icons";
 import type { Announcement, AnnouncementFormData } from "@/types/announcement";
 import { formatShortDate } from "@/lib/utils";
 
@@ -101,8 +102,9 @@ export default function AdminAnnouncementsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold font-[family-name:var(--font-poppins)] gold-text">
-            📢 Urus Pengumuman
+          <h1 className="text-2xl font-bold font-[family-name:var(--font-poppins)] gold-text flex items-center gap-2">
+            <IconMegaphone size={24} className="text-gold" />
+            Urus Pengumuman
           </h1>
           <p className="text-light-muted text-sm mt-1">
             {announcements.length} pengumuman
@@ -116,7 +118,7 @@ export default function AdminAnnouncementsPage() {
               setShowForm(true);
             }}
           >
-            + Tambah
+            <IconPlus size={16} className="inline mr-1" /> Tambah
           </Button>
         )}
       </div>
@@ -164,7 +166,7 @@ export default function AdminAnnouncementsPage() {
                 <div className="flex items-center gap-3 mt-2">
                   {item.event_date && (
                     <span className="text-xs text-gold">
-                      📅 {formatShortDate(item.event_date)}
+                      <IconCalendar size={12} className="inline mr-1" /> {formatShortDate(item.event_date)}
                     </span>
                   )}
                   <span className="text-xs text-light-muted">
@@ -183,14 +185,14 @@ export default function AdminAnnouncementsPage() {
                     setShowForm(true);
                   }}
                 >
-                  ✏️
+                  <IconEdit size={14} />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => handleDelete(item.id)}
                 >
-                  🗑️
+                  <IconTrash size={14} />
                 </Button>
               </div>
             </div>
@@ -200,7 +202,7 @@ export default function AdminAnnouncementsPage() {
 
       {announcements.length === 0 && (
         <Card className="text-center py-12">
-          <span className="text-4xl mb-4 block">📭</span>
+          <IconMegaphone size={40} className="mx-auto mb-4 text-light-muted/30" />
           <p className="text-light-muted mb-4">Tiada pengumuman.</p>
           <Button
             variant="primary"
@@ -209,7 +211,7 @@ export default function AdminAnnouncementsPage() {
               setShowForm(true);
             }}
           >
-            + Tambah Pengumuman Pertama
+            <IconPlus size={16} className="inline mr-1" /> Tambah Pengumuman Pertama
           </Button>
         </Card>
       )}

@@ -2,13 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  IconChart,
+  IconMegaphone,
+  IconWallet,
+  IconCreditCard,
+  IconClipboard,
+  IconArrowRight,
+} from "@/components/ui/Icons";
 
 const adminLinks = [
-  { href: "/admin", label: "Dashboard", icon: "📊" },
-  { href: "/admin/announcements", label: "Pengumuman", icon: "📢" },
-  { href: "/admin/campaigns", label: "Kempen", icon: "💰" },
-  { href: "/admin/donations", label: "Derma", icon: "🧾" },
-  { href: "/admin/complaints", label: "Aduan", icon: "📝" },
+  { href: "/admin", label: "Dashboard", icon: <IconChart size={16} /> },
+  { href: "/admin/announcements", label: "Pengumuman", icon: <IconMegaphone size={16} /> },
+  { href: "/admin/campaigns", label: "Kempen", icon: <IconWallet size={16} /> },
+  { href: "/admin/donations", label: "Derma", icon: <IconCreditCard size={16} /> },
+  { href: "/admin/complaints", label: "Aduan", icon: <IconClipboard size={16} /> },
 ];
 
 export default function AdminLayout({
@@ -44,7 +52,7 @@ export default function AdminLayout({
                     : "text-light-muted hover:text-light hover:bg-dark-surface"
                 }`}
               >
-                <span>{link.icon}</span>
+                {link.icon}
                 {link.label}
               </Link>
             );
@@ -72,13 +80,14 @@ export default function AdminLayout({
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                   isActive
                     ? "bg-gold/15 text-gold"
                     : "text-light-muted hover:text-light"
                 }`}
               >
-                {link.icon} {link.label}
+                {link.icon}
+                {link.label}
               </Link>
             );
           })}

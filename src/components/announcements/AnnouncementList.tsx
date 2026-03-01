@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { IconMosque, IconCalendar, IconClock, IconMegaphone } from "@/components/ui/Icons";
 import type { Announcement } from "@/types/announcement";
 import { formatDate, truncate } from "@/lib/utils";
 
@@ -11,7 +12,7 @@ export function AnnouncementList({ announcements }: AnnouncementListProps) {
   if (announcements.length === 0) {
     return (
       <Card className="text-center py-12">
-        <span className="text-4xl mb-4 block">📭</span>
+        <IconMegaphone size={40} className="mx-auto mb-4 text-light-muted/30" />
         <p className="text-light-muted">Tiada pengumuman buat masa ini.</p>
       </Card>
     );
@@ -37,7 +38,7 @@ export function AnnouncementList({ announcements }: AnnouncementListProps) {
               </div>
             ) : (
               <div className="shrink-0 w-full sm:w-40 h-40 sm:h-28 rounded-lg bg-gradient-to-br from-gold/10 to-emerald/10 flex items-center justify-center border border-dark-border">
-                <span className="text-5xl opacity-30">🕌</span>
+                <IconMosque size={40} className="text-gold/20" />
               </div>
             )}
 
@@ -61,14 +62,14 @@ export function AnnouncementList({ announcements }: AnnouncementListProps) {
               <div className="flex items-center gap-3 mt-3">
                 {item.event_date && (
                   <div className="flex items-center gap-1.5">
-                    <span className="text-gold text-xs">📅</span>
+                    <IconCalendar size={12} className="text-gold" />
                     <span className="text-xs text-gold font-medium">
                       {formatDate(item.event_date)}
                     </span>
                   </div>
                 )}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-light-muted text-xs">🕐</span>
+                  <IconClock size={12} className="text-light-muted" />
                   <span className="text-xs text-light-muted">
                     Ditambah: {formatDate(item.created_at)}
                   </span>

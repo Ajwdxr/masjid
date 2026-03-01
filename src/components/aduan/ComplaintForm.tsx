@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { IconSend, IconCheck } from "@/components/ui/Icons";
 import type { ComplaintFormData, ComplaintCategory } from "@/types/complaint";
 
 const CATEGORIES: ComplaintCategory[] = [
@@ -33,7 +33,6 @@ export function ComplaintForm({ onSubmit }: ComplaintFormProps) {
       image_url: imageUrl || null,
       is_anonymous: isAnonymous,
     });
-    // Reset
     setDescription("");
     setImageUrl("");
     setShowSuccess(true);
@@ -43,12 +42,14 @@ export function ComplaintForm({ onSubmit }: ComplaintFormProps) {
   return (
     <Card>
       <h2 className="text-lg font-semibold font-[family-name:var(--font-poppins)] gold-text mb-5">
-        📝 Borang Aduan
+        Borang Aduan
       </h2>
 
       {showSuccess && (
         <div className="mb-5 p-4 rounded-xl bg-emerald/15 border border-emerald/30 text-center animate-fade-in">
-          <span className="text-2xl mb-2 block">✅</span>
+          <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-emerald/20 flex items-center justify-center">
+            <IconCheck size={18} className="text-emerald-light" />
+          </div>
           <p className="text-sm text-emerald-light font-medium">
             Aduan anda telah berjaya dihantar!
           </p>
@@ -59,7 +60,6 @@ export function ComplaintForm({ onSubmit }: ComplaintFormProps) {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Category */}
         <div>
           <label className="block text-sm font-medium text-light mb-1.5">
             Kategori <span className="text-danger">*</span>
@@ -68,24 +68,17 @@ export function ComplaintForm({ onSubmit }: ComplaintFormProps) {
             <select
               required
               value={category}
-              onChange={(e) =>
-                setCategory(e.target.value as ComplaintCategory)
-              }
+              onChange={(e) => setCategory(e.target.value as ComplaintCategory)}
               className="w-full px-4 py-2.5 bg-dark-surface border border-dark-border rounded-[var(--radius-btn)] text-light text-sm appearance-none focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20 transition-all cursor-pointer"
             >
               {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat} className="bg-dark-surface">
-                  {cat}
-                </option>
+                <option key={cat} value={cat} className="bg-dark-surface">{cat}</option>
               ))}
             </select>
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-light-muted pointer-events-none">
-              ▾
-            </span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-light-muted pointer-events-none">▾</span>
           </div>
         </div>
 
-        {/* Description */}
         <div>
           <label className="block text-sm font-medium text-light mb-1.5">
             Keterangan Aduan <span className="text-danger">*</span>
@@ -100,7 +93,6 @@ export function ComplaintForm({ onSubmit }: ComplaintFormProps) {
           />
         </div>
 
-        {/* Image URL */}
         <div>
           <label className="block text-sm font-medium text-light mb-1.5">
             Lampiran Gambar (pilihan)
@@ -117,39 +109,30 @@ export function ComplaintForm({ onSubmit }: ComplaintFormProps) {
           </p>
         </div>
 
-        {/* Anonymous toggle */}
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setIsAnonymous(!isAnonymous)}
             className={`relative w-11 h-6 rounded-full transition-all duration-300 cursor-pointer ${
-              isAnonymous
-                ? "bg-emerald"
-                : "bg-dark-surface border border-dark-border"
+              isAnonymous ? "bg-emerald" : "bg-dark-surface border border-dark-border"
             }`}
           >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-light shadow transition-transform duration-300 ${
-                isAnonymous ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-light shadow transition-transform duration-300 ${
+              isAnonymous ? "translate-x-5" : "translate-x-0"
+            }`} />
           </button>
-          <span className="text-sm text-light-muted">
-            Hantar secara tanpa nama
-          </span>
+          <span className="text-sm text-light-muted">Hantar secara tanpa nama</span>
         </div>
 
-        {/* Info box */}
         <div className="p-3 rounded-lg bg-gold/5 border border-gold/10">
           <p className="text-xs text-light-muted leading-relaxed">
-            ℹ️ Aduan anda akan direkodkan dan diproses oleh pihak pengurusan
-            Masjid Zahir. Status aduan boleh disemak di bahagian bawah.
+            Aduan anda akan direkodkan dan diproses oleh pihak pengurusan Masjid Zahir. Status aduan boleh disemak di bahagian bawah.
           </p>
         </div>
 
-        {/* Submit */}
         <Button type="submit" variant="primary" className="w-full" size="lg">
-          📤 Hantar Aduan
+          <IconSend size={16} className="inline mr-2" />
+          Hantar Aduan
         </Button>
       </form>
     </Card>

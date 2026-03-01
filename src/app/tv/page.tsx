@@ -3,6 +3,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLiveClock } from "@/hooks/useLiveClock";
 import { usePrayerCountdown } from "@/hooks/usePrayerTimes";
+import {
+  IconMoon,
+  IconSunrise,
+  IconSun,
+  IconCloudSun,
+  IconCloud,
+  IconSunset,
+  IconMegaphone,
+  IconCalendar,
+  IconMosque,
+  IconWallet,
+} from "@/components/ui/Icons";
 import type { PrayerTime } from "@/types/prayer";
 import type { Announcement } from "@/types/announcement";
 
@@ -56,14 +68,14 @@ const mockAnnouncements: Announcement[] = [
   },
 ];
 
-const prayerIcons: Record<string, string> = {
-  Imsak: "🌑",
-  Fajr: "🌅",
-  Syuruk: "☀️",
-  Dhuhr: "🌤️",
-  Asr: "⛅",
-  Maghrib: "🌇",
-  Isha: "🌙",
+const prayerIcons: Record<string, React.ReactNode> = {
+  Imsak: <IconMoon size={28} />,
+  Fajr: <IconSunrise size={28} />,
+  Syuruk: <IconSun size={28} />,
+  Dhuhr: <IconCloudSun size={28} />,
+  Asr: <IconCloud size={28} />,
+  Maghrib: <IconSunset size={28} />,
+  Isha: <IconMoon size={28} />,
 };
 
 export default function TVPage() {
@@ -203,9 +215,9 @@ export default function TVPage() {
                         </span>
                       </div>
                     )}
-                    <span className="text-2xl block mb-2">
-                      {prayerIcons[prayer.name] || "🕌"}
-                    </span>
+                    <div className={`flex justify-center mb-2 ${isNext ? "text-gold" : "text-light-muted"}`}>
+                      {prayerIcons[prayer.name] || <IconMosque size={28} />}
+                    </div>
                     <p
                       className={`text-sm font-medium mb-1 ${
                         isNext ? "text-gold" : "text-light-muted"
@@ -228,7 +240,7 @@ export default function TVPage() {
             {/* Announcement Slider */}
             <div className="flex-1 rounded-2xl bg-dark-surface/60 border border-dark-border/50 p-6 flex flex-col justify-center overflow-hidden">
               <p className="text-xs text-gold uppercase tracking-widest font-medium mb-3">
-                📢 Pengumuman
+                <IconMegaphone size={14} className="text-gold inline mr-1" /> Pengumuman
               </p>
               <div key={currentSlide} className="animate-fade-in">
                 <h2 className="text-2xl font-bold font-[family-name:var(--font-poppins)] text-light mb-2">
@@ -239,7 +251,7 @@ export default function TVPage() {
                 </p>
                 {currentAnn.event_date && (
                   <p className="text-sm text-gold mt-3">
-                    📅{" "}
+                    <IconCalendar size={14} className="inline mr-1" />{" "}
                     {new Date(currentAnn.event_date).toLocaleDateString("ms-MY", {
                       weekday: "long",
                       day: "numeric",
@@ -270,26 +282,26 @@ export default function TVPage() {
         <div className="bg-dark-surface/90 border-t border-gold/20 py-3 overflow-hidden">
           <div className="animate-ticker whitespace-nowrap">
             <span className="inline-block text-sm">
-              <span className="text-gold font-semibold mx-4">🕌 Masjid Zahir</span>
+              <span className="text-gold font-semibold mx-4">Masjid Zahir</span>
               <span className="text-light-muted mx-4">|</span>
               <span className="text-light mx-4">Ceramah Khas Ramadan — 15 Mac 2026</span>
               <span className="text-light-muted mx-4">|</span>
               <span className="text-light mx-4">Program Tadarus Al-Quran — Setiap hari selepas Subuh</span>
               <span className="text-light-muted mx-4">|</span>
-              <span className="text-gold mx-4">💰 Tabung Masjid: RM 187,500 / RM 500,000 (38%)</span>
+              <span className="text-gold mx-4">Tabung Masjid: RM 187,500 / RM 500,000 (38%)</span>
               <span className="text-light-muted mx-4">|</span>
               <span className="text-light mx-4">Gotong-Royong Masjid — 10 Mac 2026</span>
               <span className="text-light-muted mx-4">|</span>
               <span className="text-emerald-light mx-4">Zahir Digital — Sistem Pengurusan Masjid Pintar</span>
               <span className="text-light-muted mx-8"></span>
               {/* Repeat for seamless loop */}
-              <span className="text-gold font-semibold mx-4">🕌 Masjid Zahir</span>
+              <span className="text-gold font-semibold mx-4">Masjid Zahir</span>
               <span className="text-light-muted mx-4">|</span>
               <span className="text-light mx-4">Ceramah Khas Ramadan — 15 Mac 2026</span>
               <span className="text-light-muted mx-4">|</span>
               <span className="text-light mx-4">Program Tadarus Al-Quran — Setiap hari selepas Subuh</span>
               <span className="text-light-muted mx-4">|</span>
-              <span className="text-gold mx-4">💰 Tabung Masjid: RM 187,500 / RM 500,000 (38%)</span>
+              <span className="text-gold mx-4">Tabung Masjid: RM 187,500 / RM 500,000 (38%)</span>
               <span className="text-light-muted mx-4">|</span>
               <span className="text-light mx-4">Gotong-Royong Masjid — 10 Mac 2026</span>
               <span className="text-light-muted mx-4">|</span>

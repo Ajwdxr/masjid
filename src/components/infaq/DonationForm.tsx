@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { IconCreditCard, IconCheck, IconLink } from "@/components/ui/Icons";
 import type { DonationFormData } from "@/types/donation";
 
 interface DonationFormProps {
@@ -46,13 +47,16 @@ export function DonationForm({
 
   return (
     <Card>
-      <h3 className="text-lg font-semibold font-[family-name:var(--font-poppins)] gold-text mb-5">
-        💳 Buat Sumbangan
+      <h3 className="text-lg font-semibold font-[family-name:var(--font-poppins)] gold-text mb-5 flex items-center gap-2">
+        <IconCreditCard size={20} className="text-gold" />
+        Buat Sumbangan
       </h3>
 
       {showSuccess && (
         <div className="mb-5 p-4 rounded-xl bg-emerald/15 border border-emerald/30 text-center animate-fade-in">
-          <span className="text-2xl mb-2 block">✅</span>
+          <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-emerald/20 flex items-center justify-center">
+            <IconCheck size={18} className="text-emerald-light" />
+          </div>
           <p className="text-sm text-emerald-light font-medium">
             Jazakallahu Khairan! Sumbangan anda telah direkodkan.
           </p>
@@ -166,7 +170,7 @@ export function DonationForm({
             className="w-full"
             size="lg"
           >
-            💳 Sumbang RM {effectiveAmount.toFixed(2)}
+            <IconCreditCard size={16} className="inline mr-1" /> Sumbang RM {effectiveAmount.toFixed(2)}
           </Button>
 
           {paymentLink && (
@@ -182,7 +186,7 @@ export function DonationForm({
                 className="w-full"
                 size="lg"
               >
-                🔗 Bayar melalui DuitNow / ToyyibPay
+                <IconLink size={16} className="inline mr-1" /> Bayar melalui DuitNow / ToyyibPay
               </Button>
             </a>
           )}

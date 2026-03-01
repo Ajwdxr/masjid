@@ -4,15 +4,16 @@ import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { IconClipboard, IconBroom, IconWrench, IconShield, IconCheck, IconRefresh } from "@/components/ui/Icons";
 import type { Complaint, ComplaintStatus } from "@/types/complaint";
 import { formatShortDate } from "@/lib/utils";
 
-const categoryIcons: Record<string, string> = {
-  Kebersihan: "🧹",
-  Kemudahan: "🔧",
-  Pengurusan: "📋",
-  Keselamatan: "🛡️",
-  "Lain-lain": "📌",
+const categoryIcons: Record<string, React.ReactNode> = {
+  Kebersihan: <IconBroom size={16} />,
+  Kemudahan: <IconWrench size={16} />,
+  Pengurusan: <IconClipboard size={16} />,
+  Keselamatan: <IconShield size={16} />,
+  "Lain-lain": <IconClipboard size={16} />,
 };
 
 /* ─── Mock data ─── */
@@ -90,8 +91,9 @@ export default function AdminComplaintsPage() {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold font-[family-name:var(--font-poppins)] gold-text">
-          📝 Urus Aduan
+        <h1 className="text-2xl font-bold font-[family-name:var(--font-poppins)] gold-text flex items-center gap-2">
+          <IconClipboard size={24} className="text-gold" />
+          Urus Aduan
         </h1>
         <p className="text-light-muted text-sm mt-1">
           {complaints.length} aduan &middot; {dalamTindakan} dalam tindakan
@@ -130,8 +132,8 @@ export default function AdminComplaintsPage() {
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3 flex-1 min-w-0">
-                <div className="shrink-0 w-9 h-9 rounded-lg bg-dark-surface flex items-center justify-center text-sm border border-dark-border">
-                  {categoryIcons[item.category] || "📌"}
+                <div className="shrink-0 w-9 h-9 rounded-lg bg-dark-surface flex items-center justify-center text-light-muted border border-dark-border">
+                  {categoryIcons[item.category] || <IconClipboard size={16} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -166,7 +168,7 @@ export default function AdminComplaintsPage() {
                       handleStatusUpdate(item.id, "Selesai")
                     }
                   >
-                    ✅ Selesai
+                    <IconCheck size={14} className="inline mr-1" /> Selesai
                   </Button>
                 ) : (
                   <Button
@@ -176,7 +178,7 @@ export default function AdminComplaintsPage() {
                       handleStatusUpdate(item.id, "Dalam Tindakan")
                     }
                   >
-                    ↩️ Buka Semula
+                    <IconRefresh size={14} className="inline mr-1" /> Buka Semula
                   </Button>
                 )}
               </div>
@@ -187,7 +189,7 @@ export default function AdminComplaintsPage() {
 
       {filtered.length === 0 && (
         <Card className="text-center py-12">
-          <span className="text-4xl mb-4 block">📭</span>
+          <IconClipboard size={40} className="mx-auto mb-4 text-light-muted/30" />
           <p className="text-light-muted">
             Tiada aduan untuk paparan ini.
           </p>
