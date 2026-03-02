@@ -3,20 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLiveClock } from "@/hooks/useLiveClock";
 import { usePrayerCountdown } from "@/hooks/usePrayerTimes";
-import {
-  IconMoon,
-  IconSunrise,
-  IconSun,
-  IconCloudSun,
-  IconCloud,
-  IconSunset,
-  IconMegaphone,
-  IconCalendar,
-  IconMosque,
-  IconWallet,
-} from "@/components/ui/Icons";
 import type { PrayerTime } from "@/types/prayer";
 import type { Announcement } from "@/types/announcement";
+import { fetchPrayerTimes } from "@/lib/prayer-times";
 
 /* ─── Mock data (will be replaced by Supabase + API fetch) ─── */
 const mockPrayers: PrayerTime[] = [
@@ -68,22 +57,34 @@ const mockAnnouncements: Announcement[] = [
   },
 ];
 
-const prayerIcons: Record<string, React.ReactNode> = {
-  Imsak: <IconMoon size={28} />,
-  Fajr: <IconSunrise size={28} />,
-  Syuruk: <IconSun size={28} />,
-  Dhuhr: <IconCloudSun size={28} />,
-  Asr: <IconCloud size={28} />,
-  Maghrib: <IconSunset size={28} />,
-  Isha: <IconMoon size={28} />,
-};
-
 export default function TVPage() {
   const { formattedTime } = useLiveClock();
-  const { nextPrayer, countdown } = usePrayerCountdown(mockPrayers);
+  const [prayers, setPrayers] = useState<PrayerTime[]>(mockPrayers);
+  const { nextPrayer, countdown } = usePrayerCountdown(prayers);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [hijriDate, setHijriDate] = useState("");
   const [gregorianDate, setGregorianDate] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch real prayer times
+  const refreshPrayers = useCallback(async () => {
+    try {
+      const data = await fetchPrayerTimes();
+      setPrayers(data.prayers);
+      if (data.hijriDate) setHijriDate(data.hijriDate);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch prayers:", error);
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshPrayers();
+    // Refresh every hour
+    const interval = setInterval(refreshPrayers, 3600000);
+    return () => clearInterval(interval);
+  }, [refreshPrayers]);
 
   // Rotate announcements every 8 seconds
   useEffect(() => {
@@ -125,191 +126,296 @@ export default function TVPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const displayPrayers = mockPrayers.filter((p) => p.name !== "Imsak");
+  const displayPrayers = prayers.filter((p: PrayerTime) => p.name !== "Imsak");
   const currentAnn = mockAnnouncements[currentSlide];
 
   return (
-    <div className="w-screen h-screen bg-dark text-light overflow-hidden relative">
-      {/* Background pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23C8A951' fill-opacity='1'%3E%3Cpath d='M40 0L60 20L40 40L20 20zM40 40L60 60L40 80L20 60z'/%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      />
-
-      <div className="relative h-full flex flex-col">
-        {/* ─── Top Bar ─── */}
-        <div className="flex items-center justify-between px-8 py-4 bg-dark-surface/80 border-b border-dark-border/50">
-          {/* Logo & Name */}
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl gold-gradient flex items-center justify-center text-dark text-2xl font-bold font-[family-name:var(--font-poppins)] shadow-xl">
-              Z
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-[family-name:var(--font-poppins)] gold-text">
-                Masjid Zahir
-              </h1>
-              <p className="text-xs text-light-muted">
-                Alor Setar, Kedah Darul Aman
-              </p>
-            </div>
-          </div>
-
-          {/* Date */}
-          <div className="text-right">
-            <p className="text-sm text-light">{gregorianDate}</p>
-            {hijriDate && (
-              <p className="text-xs text-gold">{hijriDate}</p>
-            )}
-          </div>
-        </div>
-
-        {/* ─── Main Content ─── */}
-        <div className="flex-1 flex px-8 py-6 gap-6 min-h-0">
-          {/* Left: Clock + Countdown */}
-          <div className="flex flex-col items-center justify-center w-[40%] gap-6">
-            {/* Live Clock */}
-            <div className="text-center">
-              <p className="text-7xl xl:text-8xl font-bold font-[family-name:var(--font-poppins)] gold-text tracking-wider tabular-nums">
-                {formattedTime}
-              </p>
-            </div>
-
-            {/* Countdown */}
-            {countdown && nextPrayer && (
-              <div className="text-center w-full max-w-md p-6 rounded-2xl bg-emerald/10 border border-emerald/20">
-                <p className="text-sm text-emerald-light uppercase tracking-widest font-medium mb-2">
-                  Waktu {nextPrayer.nameMs} dalam
-                </p>
-                <p className="text-5xl xl:text-6xl font-bold font-[family-name:var(--font-poppins)] text-light tabular-nums">
-                  {String(countdown.hours).padStart(2, "0")}
-                  <span className="text-gold mx-2">:</span>
-                  {String(countdown.minutes).padStart(2, "0")}
-                  <span className="text-gold mx-2">:</span>
-                  {String(countdown.seconds).padStart(2, "0")}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Right: Prayer Times + Announcement */}
-          <div className="flex-1 flex flex-col gap-6 min-h-0">
-            {/* Prayer Times Grid */}
-            <div className="grid grid-cols-6 gap-3">
-              {displayPrayers.map((prayer) => {
-                const isNext = nextPrayer?.name === prayer.name;
-                return (
-                  <div
-                    key={prayer.name}
-                    className={`relative text-center py-5 px-3 rounded-2xl transition-all duration-500 ${
-                      isNext
-                        ? "bg-gold/15 border-2 border-gold/40 shadow-[0_0_25px_rgba(200,169,81,0.15)] scale-105"
-                        : "bg-dark-surface/60 border border-dark-border/50"
-                    }`}
-                  >
-                    {isNext && (
-                      <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                        <span className="inline-block px-3 py-1 text-[9px] font-bold uppercase tracking-wider bg-gold text-dark rounded-full animate-pulse-gold">
-                          Seterusnya
-                        </span>
-                      </div>
-                    )}
-                    <div className={`flex justify-center mb-2 ${isNext ? "text-gold" : "text-light-muted"}`}>
-                      {prayerIcons[prayer.name] || <IconMosque size={28} />}
-                    </div>
-                    <p
-                      className={`text-sm font-medium mb-1 ${
-                        isNext ? "text-gold" : "text-light-muted"
-                      }`}
-                    >
-                      {prayer.nameMs}
-                    </p>
-                    <p
-                      className={`text-xl font-bold font-[family-name:var(--font-poppins)] tabular-nums ${
-                        isNext ? "text-light" : "text-light/80"
-                      }`}
-                    >
-                      {prayer.time}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Announcement Slider */}
-            <div className="flex-1 rounded-2xl bg-dark-surface/60 border border-dark-border/50 p-6 flex flex-col justify-center overflow-hidden">
-              <p className="text-xs text-gold uppercase tracking-widest font-medium mb-3">
-                <IconMegaphone size={14} className="text-gold inline mr-1" /> Pengumuman
-              </p>
-              <div key={currentSlide} className="animate-fade-in">
-                <h2 className="text-2xl font-bold font-[family-name:var(--font-poppins)] text-light mb-2">
-                  {currentAnn.title}
-                </h2>
-                <p className="text-base text-light-muted leading-relaxed">
-                  {currentAnn.description}
-                </p>
-                {currentAnn.event_date && (
-                  <p className="text-sm text-gold mt-3">
-                    <IconCalendar size={14} className="inline mr-1" />{" "}
-                    {new Date(currentAnn.event_date).toLocaleDateString("ms-MY", {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </p>
-                )}
-              </div>
-              {/* Slide indicators */}
-              <div className="flex gap-2 mt-4">
-                {mockAnnouncements.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1 rounded-full transition-all duration-500 ${
-                      i === currentSlide
-                        ? "bg-gold w-8"
-                        : "bg-dark-border w-4"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ─── Bottom Ticker ─── */}
-        <div className="bg-dark-surface/90 border-t border-gold/20 py-3 overflow-hidden">
-          <div className="animate-ticker whitespace-nowrap">
-            <span className="inline-block text-sm">
-              <span className="text-gold font-semibold mx-4">Masjid Zahir</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-light mx-4">Ceramah Khas Ramadan — 15 Mac 2026</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-light mx-4">Program Tadarus Al-Quran — Setiap hari selepas Subuh</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-gold mx-4">Tabung Masjid: RM 187,500 / RM 500,000 (38%)</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-light mx-4">Gotong-Royong Masjid — 10 Mac 2026</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-emerald-light mx-4">Zahir Digital — Sistem Pengurusan Masjid Pintar</span>
-              <span className="text-light-muted mx-8"></span>
-              {/* Repeat for seamless loop */}
-              <span className="text-gold font-semibold mx-4">Masjid Zahir</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-light mx-4">Ceramah Khas Ramadan — 15 Mac 2026</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-light mx-4">Program Tadarus Al-Quran — Setiap hari selepas Subuh</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-gold mx-4">Tabung Masjid: RM 187,500 / RM 500,000 (38%)</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-light mx-4">Gotong-Royong Masjid — 10 Mac 2026</span>
-              <span className="text-light-muted mx-4">|</span>
-              <span className="text-emerald-light mx-4">Zahir Digital — Sistem Pengurusan Masjid Pintar</span>
+    <div className="fixed inset-0 bg-background-dark text-slate-100 font-sans flex flex-col overflow-hidden selection:bg-primary selection:text-black z-[100]">
+      <header className="flex flex-col items-center justify-center pt-8 pb-6 bg-gradient-to-b from-[#1a1814] to-background-dark shrink-0 relative z-20 border-b border-primary/10">
+        <div className="absolute left-10 top-1/2 -translate-y-1/2 flex items-center gap-5">
+          <div className="size-20 bg-gradient-to-br from-primary/20 to-transparent rounded-full flex items-center justify-center p-0.5 border border-primary/40 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+            <span className="material-symbols-outlined text-primary text-5xl">
+              mosque
             </span>
           </div>
+          <div className="flex flex-col justify-center">
+            <h1 className="text-2xl font-bold tracking-widest text-white uppercase font-serif">
+              Masjid Zahir
+            </h1>
+            <p className="text-primary text-sm font-medium tracking-widest uppercase opacity-80">
+              Alor Setar, Kedah
+            </p>
+          </div>
         </div>
-      </div>
+        <div className="flex flex-col items-center gap-2">
+          <div className="text-7xl font-bold text-white tracking-widest font-serif leading-none flex items-start drop-shadow-2xl tabular-nums">
+            {formattedTime.split(" ")[0]}
+            <span className="text-primary text-3xl mt-2 ml-2 font-sans font-bold tracking-normal uppercase">
+              {formattedTime.split(" ")[1]}
+            </span>
+          </div>
+          <div className="flex items-center gap-4 mt-2">
+            <div className="h-px w-12 bg-primary/30"></div>
+            <div className="text-xl text-primary/90 font-medium tracking-wide font-serif">
+              {hijriDate}
+            </div>
+            <div className="h-px w-12 bg-primary/30"></div>
+          </div>
+          <div className="text-slate-400 text-sm font-medium uppercase tracking-widest">
+            {gregorianDate}
+          </div>
+        </div>
+        <div className="absolute right-10 top-1/2 -translate-y-1/2">
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-2 text-primary/70">
+              <span className="material-symbols-outlined text-xl">cloud</span>
+              <span className="font-bold text-xl">32°C</span>
+            </div>
+            <p className="text-xs text-slate-500 uppercase tracking-wider">
+              Alor Setar
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 flex gap-8 px-10 pb-8 min-h-0">
+        {/* Left Column: Prayer Times */}
+        <div className="w-[32%] flex flex-col gap-6 h-full min-h-0 mt-6">
+          <div className="bg-[#12100c] rounded-none border border-primary/40 shadow-[0_0_20px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center relative overflow-hidden shrink-0 py-8 px-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50"></div>
+            <p className="text-primary text-xs uppercase tracking-[0.3em] font-bold z-10 mb-4 border-b border-primary/20 pb-2">
+              Next Prayer In
+            </p>
+            {countdown && nextPrayer ? (
+              <div className="flex gap-6 z-10 items-baseline">
+                <div className="flex flex-col items-center">
+                  <span className="text-6xl font-serif font-medium text-white leading-none tabular-nums">
+                    {String(countdown.hours).padStart(2, "0")}
+                  </span>
+                  <span className="text-[10px] text-slate-500 mt-2 uppercase tracking-widest">
+                    Hour
+                  </span>
+                </div>
+                <span className="text-4xl text-primary/40 font-serif font-light -translate-y-4">
+                  :
+                </span>
+                <div className="flex flex-col items-center">
+                  <span className="text-6xl font-serif font-medium text-white leading-none tabular-nums">
+                    {String(countdown.minutes).padStart(2, "0")}
+                  </span>
+                  <span className="text-[10px] text-slate-500 mt-2 uppercase tracking-widest">
+                    Min
+                  </span>
+                </div>
+                <span className="text-4xl text-primary/40 font-serif font-light -translate-y-4">
+                  :
+                </span>
+                <div className="flex flex-col items-center">
+                  <span className="text-6xl font-serif font-medium text-white leading-none tabular-nums">
+                    {String(countdown.seconds).padStart(2, "0")}
+                  </span>
+                  <span className="text-[10px] text-slate-500 mt-2 uppercase tracking-widest">
+                    Sec
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-6 z-10 items-baseline opacity-50">
+                <span className="text-4xl font-serif text-white">-- : -- : --</span>
+              </div>
+            )}
+            <div className="mt-4 text-slate-300 text-lg font-serif italic z-10">
+              Towards{" "}
+              <span className="text-primary font-normal not-italic">
+                {nextPrayer?.nameMs || "..."}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex-1 bg-surface-dark/50 border-t border-b border-white/5 flex flex-col justify-between py-2">
+            {displayPrayers.map((prayer: PrayerTime, i: number) => {
+              const isActive = nextPrayer?.name === prayer.name;
+              return (
+                <div
+                  key={prayer.name}
+                  className={`flex justify-between items-center px-6 py-4 border-b border-white/5 transition-all duration-500 ${
+                    isActive
+                      ? "bg-gradient-to-r from-primary to-[#bfa140] text-black shadow-lg shadow-black/50 relative my-1 transform scale-105 z-10"
+                      : i % 2 === 0
+                      ? ""
+                      : "bg-white/[0.02]"
+                  }`}
+                >
+                  {isActive && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-white"></div>
+                  )}
+                  <span
+                    className={`${
+                      isActive
+                        ? "font-bold text-xl"
+                        : "text-slate-400 text-lg font-light"
+                    } uppercase tracking-widest`}
+                  >
+                    {prayer.nameMs}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    {isActive && (
+                      <span className="material-symbols-outlined animate-pulse text-2xl">
+                        notifications_active
+                      </span>
+                    )}
+                    <span
+                      className={`${
+                        isActive ? "font-bold text-4xl" : "text-slate-200 text-3xl"
+                      } font-serif tabular-nums`}
+                    >
+                      {prayer.time}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Column: Announcements & Hadith */}
+        <div className="w-[68%] flex flex-col gap-6 h-full min-h-0 mt-6">
+          <div className="flex-1 bg-[#161410] overflow-hidden relative group border border-white/5 shadow-2xl">
+            <div className="absolute inset-0 z-0">
+              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30 z-10"></div>
+              <div
+                className="w-full h-full bg-cover bg-center transition-transform duration-[20s] ease-linear scale-110"
+                style={{
+                  backgroundImage: `url('${
+                    currentAnn.image_url ||
+                    "https://lh3.googleusercontent.com/aida-public/AB6AXuD7eKqx9Gje6MyYQSZLkhMK0jJ1O7O-cgQvfHZOVUyipbWTORPckmf0XLANHimDAYTSc-_vGAjgAGRxzNbNtvyB2D__wUMYWyDGR9xvWoPVawrUeVjsORrMsUBJRtvepOQopHb6-2Wu_XVYIAkIKGzRyl4wkXxA-6hUVA6jl7k5CPfVVBIKTRsUfYbXQiss-Q8gIj8WnZb0uOvFPqbb14mdnoTKNnsYPBGladXHGChe5vqBufFJHrdt6Jc5TUTIXmSFBlDA3G3jix8"
+                  }')`,
+                }}
+              ></div>
+            </div>
+            <div className="relative z-20 h-full flex flex-col justify-end p-12 max-w-3xl animate-fade-in" key={currentAnn.id}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-px w-12 bg-primary"></div>
+                <span className="text-primary font-bold uppercase tracking-[0.2em] text-sm">
+                  Pengumuman Masjid
+                </span>
+              </div>
+              <h2 className="text-6xl font-bold text-white leading-tight mb-8 font-serif drop-shadow-lg">
+                {currentAnn.title}
+              </h2>
+              <div className="flex items-center gap-12 pt-8 border-t border-white/10">
+                <div className="max-w-md">
+                  <p className="text-slate-400 text-xs uppercase tracking-widest mb-1">
+                    Details
+                  </p>
+                  <p className="text-xl text-white font-serif line-clamp-2 leading-relaxed">
+                    {currentAnn.description}
+                  </p>
+                </div>
+                {currentAnn.event_date && (
+                  <>
+                    <div className="w-px h-12 bg-white/20"></div>
+                    <div>
+                      <p className="text-slate-400 text-xs uppercase tracking-widest mb-1">
+                        Tarikh & Masa
+                      </p>
+                      <p className="text-2xl text-white font-serif">
+                        {new Date(currentAnn.event_date).toLocaleDateString("ms-MY", {
+                          day: "numeric",
+                          month: "short",
+                        })}{" "}
+                        <span className="text-primary text-lg align-middle mx-1">
+                          •
+                        </span>{" "}
+                        Selepas Maghrib
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="h-32 bg-[#1a1814] border-l-4 border-primary flex items-center relative overflow-hidden px-8 shadow-lg">
+            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#1a1814] to-transparent z-10"></div>
+            <div className="absolute -right-10 -bottom-10 text-primary/5">
+              <span className="material-symbols-outlined text-[180px]">
+                format_quote
+              </span>
+            </div>
+            <div className="flex items-center gap-8 w-full z-20">
+              <div className="flex flex-col items-center justify-center shrink-0 pr-8 border-r border-white/10">
+                <span className="material-symbols-outlined text-primary text-4xl mb-1">
+                  lightbulb
+                </span>
+                <span className="text-[10px] text-slate-500 uppercase tracking-widest text-center w-max">
+                  Hadith of
+                  <br />
+                  the Day
+                </span>
+              </div>
+              <div>
+                <p className="text-xl text-slate-200 font-serif italic leading-relaxed">
+                  "The best among you are those who have the best manners and
+                  character."
+                </p>
+                <p className="text-primary/70 text-sm mt-2 font-medium uppercase tracking-wide">
+                  — Sahih Bukhari
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer className="h-12 bg-[#080705] border-t border-primary/20 flex items-center overflow-hidden relative shrink-0 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
+        <div className="bg-[#0f0e0b] h-full px-8 flex items-center justify-center z-30 border-r border-primary/30 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
+          <span className="text-primary text-sm font-black uppercase tracking-[0.3em] relative">
+            Updates
+          </span>
+        </div>
+        <div className="flex-1 overflow-hidden h-full flex items-center">
+          <div className="marquee-content flex items-center gap-32 px-10 text-lg font-medium text-slate-300 animate-ticker whitespace-nowrap">
+            <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+              <span>
+                Masjid Expansion Fund:{" "}
+                <span className="text-white">RM 187,500</span> raised of RM
+                500,000 goal
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+              <span>
+                Weekend Quran Class registration is open until{" "}
+                <span className="text-white">15 Mar</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+              <span>Please ensure phones are on silent mode during prayer</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+              <span>
+                Next community cleanup:{" "}
+                <span className="text-white">Sunday 8:00 AM</span>
+              </span>
+            </div>
+            {/* Duplicate for seamless loop */}
+            <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+              <span>
+                Masjid Expansion Fund:{" "}
+                <span className="text-white">RM 187,500</span> raised of RM
+                500,000 goal
+              </span>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

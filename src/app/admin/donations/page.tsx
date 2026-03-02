@@ -25,20 +25,33 @@ export default function AdminDonationsPage() {
   const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
 
   return (
-    <div>
+    <div className="flex flex-col h-full bg-background-dark">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold font-[family-name:var(--font-poppins)] gold-text">
-          <IconCreditCard size={24} className="text-gold" />
-          Senarai Derma
-        </h1>
-        <p className="text-light-muted text-sm mt-1">
-          {donations.length} rekod &middot; Jumlah: {formatCurrency(totalAmount)}
-        </p>
-      </div>
+      <header className="flex items-center justify-between px-8 py-6 bg-background-dark/80 backdrop-blur-md sticky top-0 z-10 border-b border-[#3a3528]">
+        <div>
+          <h2 className="text-2xl font-bold text-white tracking-tight">
+            Donation Records
+          </h2>
+          <p className="text-text-admin-muted text-sm mt-1">
+            {donations.length} records &middot; Total: {formatCurrency(totalAmount)}
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <button className="p-2 text-text-admin-muted hover:text-white transition-colors relative">
+            <span className="material-symbols-outlined">notifications</span>
+            <span className="absolute top-1.5 right-2 h-2 w-2 bg-red-500 rounded-full"></span>
+          </button>
+          <button className="bg-primary hover:bg-primary-dark text-background-dark font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+            <span className="material-symbols-outlined text-[20px]">download</span>
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </header>
 
-      {/* Donations Table */}
-      <Card className="overflow-hidden p-0">
+      <div className="flex-1 overflow-y-auto p-8">
+        <div className="max-w-[1600px] mx-auto">
+          {/* Donations Table */}
+          <div className="bg-surface-dark rounded-xl border border-[#3a3528] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -113,7 +126,9 @@ export default function AdminDonationsPage() {
             </tbody>
           </table>
         </div>
-      </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Poppins } from "next/font/google";
+import { Inter, Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { MobileNav } from "@/components/layout/MobileNav";
@@ -15,6 +15,13 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "900"],
   display: "swap",
 });
 
@@ -50,8 +57,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ms" className="dark">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${inter.variable} ${poppins.variable} font-sans antialiased islamic-pattern min-h-screen`}
+        className={`${inter.variable} ${poppins.variable} ${playfair.variable} font-sans antialiased islamic-pattern min-h-screen`}
       >
         <Navbar />
         <main className="min-h-screen pb-20 md:pb-0">{children}</main>

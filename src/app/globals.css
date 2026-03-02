@@ -23,9 +23,20 @@
   --color-success: #198754;
   --color-info: #0d6efd;
 
+  /* ─── User-defined Premium Palette ─── */
+  --color-primary: #c8a851;
+  --color-primary-dark: #b09242;
+  --color-primary-light: #e6c975;
+  --color-background-light: #f8f7f6;
+  --color-background-dark: #1e1b14;
+  --color-surface-dark: #2a2720;
+  --color-surface-darker: #181612;
+  --color-text-admin-muted: #bfb59c;
+
   /* ─── Typography ─── */
-  --font-sans: "Inter", sans-serif;
-  --font-display: "Poppins", sans-serif;
+  --font-sans: var(--font-inter), sans-serif;
+  --font-display: var(--font-poppins), sans-serif;
+  --font-serif: var(--font-playfair), serif;
 
   /* ─── Spacing ─── */
   --radius-card: 1rem;
@@ -105,22 +116,32 @@ body {
   transition: width 1s ease;
 }
 
+/* ─── Material Symbols ─── */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.material-symbols-outlined.filled {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-dark);
+  background: #1e1b14;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-dark-border);
-  border-radius: 3px;
+  background: #413b2a;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-gold-dark);
+  background: #c8a851;
 }
 
 /* ─── Animations ─── */
