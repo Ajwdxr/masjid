@@ -9,10 +9,12 @@ import {
   IconCreditCard,
   IconClipboard,
   IconArrowRight,
+  IconMosque,
 } from "@/components/ui/Icons";
 
 const adminLinks = [
   { href: "/admin", label: "Dashboard", icon: <IconChart size={16} /> },
+  { href: "/admin/mosque-profile", label: "Mosque Profile", icon: <IconMosque size={16} /> },
   { href: "/admin/announcements", label: "Pengumuman", icon: <IconMegaphone size={16} /> },
   { href: "/admin/campaigns", label: "Kempen", icon: <IconWallet size={16} /> },
   { href: "/admin/donations", label: "Derma", icon: <IconCreditCard size={16} /> },
@@ -61,6 +63,7 @@ export default function AdminLayout({
               // Map icons to Material Symbols
               const iconMap: Record<string, string> = {
                 Dashboard: "dashboard",
+                "Mosque Profile": "mosque",
                 Pengumuman: "announcement",
                 Kempen: "campaign",
                 Derma: "volunteer_activism",
@@ -72,18 +75,15 @@ export default function AdminLayout({
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${
-                    isActive
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${isActive
                       ? "bg-primary/10 text-primary border border-primary/20"
                       : "text-text-admin-muted hover:bg-surface-dark hover:text-white"
-                  }`}
+                    }`}
                 >
                   <span
-                    className={`material-symbols-outlined ${
-                      isActive ? "filled" : ""
-                    } transition-colors ${
-                      isActive ? "text-primary" : "text-text-admin-muted group-hover:text-primary"
-                    }`}
+                    className={`material-symbols-outlined ${isActive ? "filled" : ""
+                      } transition-colors ${isActive ? "text-primary" : "text-text-admin-muted group-hover:text-primary"
+                      }`}
                   >
                     {iconName}
                   </span>

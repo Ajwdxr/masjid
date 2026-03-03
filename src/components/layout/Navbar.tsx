@@ -10,10 +10,12 @@ import {
   IconClipboard,
   IconGrid,
   IconTv,
+  IconMosque,
 } from "@/components/ui/Icons";
 
 const navLinks = [
   { href: "/", label: "Utama", icon: <IconHome size={16} /> },
+  { href: "/masjid", label: "Masjid", icon: <IconMosque size={16} /> },
   { href: "/announcements", label: "Pengumuman", icon: <IconMegaphone size={16} /> },
   { href: "/infaq", label: "Infaq", icon: <IconWallet size={16} /> },
   { href: "/aduan", label: "Aduan", icon: <IconClipboard size={16} /> },
@@ -54,11 +56,10 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium transition-all duration-200 ${
-                    isActive
+                  className={`px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium transition-all duration-200 ${isActive
                       ? "bg-gold/10 text-gold border border-gold/20"
                       : "text-light-muted hover:text-light hover:bg-dark-surface"
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -81,19 +82,16 @@ export function Navbar() {
           >
             <div className="w-5 h-5 flex flex-col justify-center gap-1">
               <span
-                className={`block h-0.5 bg-light transition-all duration-300 ${
-                  isOpen ? "rotate-45 translate-y-[3px]" : ""
-                }`}
+                className={`block h-0.5 bg-light transition-all duration-300 ${isOpen ? "rotate-45 translate-y-[3px]" : ""
+                  }`}
               />
               <span
-                className={`block h-0.5 bg-light transition-all duration-300 ${
-                  isOpen ? "opacity-0" : ""
-                }`}
+                className={`block h-0.5 bg-light transition-all duration-300 ${isOpen ? "opacity-0" : ""
+                  }`}
               />
               <span
-                className={`block h-0.5 bg-light transition-all duration-300 ${
-                  isOpen ? "-rotate-45 -translate-y-[3px]" : ""
-                }`}
+                className={`block h-0.5 bg-light transition-all duration-300 ${isOpen ? "-rotate-45 -translate-y-[3px]" : ""
+                  }`}
               />
             </div>
           </button>
@@ -109,11 +107,10 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium transition-all ${
-                    isActive
+                  className={`flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium transition-all ${isActive
                       ? "bg-gold/10 text-gold"
                       : "text-light-muted hover:text-light hover:bg-dark-surface"
-                  }`}
+                    }`}
                 >
                   {link.icon}
                   {link.label}
