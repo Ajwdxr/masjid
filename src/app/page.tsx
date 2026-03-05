@@ -60,12 +60,16 @@ const mockCampaign: Campaign = {
   created_at: "2026-01-01",
 };
 
+import { PageTracker } from "@/components/analytics/PageTracker";
+
 export default async function HomePage() {
   // Server-side fetch prayer times
   const prayerData = await fetchPrayerTimes();
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <PageTracker path="/" />
+      
       {/* ─── Hero / Branding ─── */}
       <section className="text-center pt-4 pb-2 animate-fade-in">
         <div className="w-20 h-20 mx-auto rounded-2xl gold-gradient flex items-center justify-center text-dark text-3xl font-bold font-[family-name:var(--font-poppins)] shadow-2xl mb-4">
@@ -88,7 +92,7 @@ export default async function HomePage() {
       </section>
 
       {/* ─── Prayer Times ─── */}
-      <section className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
+      <section className="animate-fade-in" style={{ animationDelay: "0.2s" }} data-facility="Prayer Times">
         <Card>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold font-[family-name:var(--font-poppins)] gold-text flex items-center gap-2">
@@ -102,7 +106,7 @@ export default async function HomePage() {
       </section>
 
       {/* ─── Latest Announcements ─── */}
-      <section className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
+      <section className="animate-fade-in" style={{ animationDelay: "0.3s" }} data-facility="Announcements">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold font-[family-name:var(--font-poppins)] text-light flex items-center gap-2">
             <IconMegaphone size={18} className="text-gold" />
@@ -127,7 +131,7 @@ export default async function HomePage() {
       </section>
 
       {/* ─── Active Campaign ─── */}
-      <section className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
+      <section className="animate-fade-in" style={{ animationDelay: "0.4s" }} data-facility="Infaq Campaign">
         <h2 className="text-lg font-semibold font-[family-name:var(--font-poppins)] text-light flex items-center gap-2 mb-4">
           <IconWallet size={18} className="text-gold" />
           Kempen Infaq Aktif
@@ -139,6 +143,7 @@ export default async function HomePage() {
       <section
         className="text-center pb-6 animate-fade-in"
         style={{ animationDelay: "0.5s" }}
+        data-facility="Complaints Form"
       >
         <Link href="/aduan">
           <Button variant="outline" size="lg">

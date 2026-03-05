@@ -2,21 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  IconChart,
-  IconMegaphone,
-  IconWallet,
-  IconCreditCard,
-  IconClipboard,
-  IconArrowRight,
-} from "@/components/ui/Icons";
 
 const adminLinks = [
-  { href: "/admin", label: "Dashboard", icon: <IconChart size={16} /> },
-  { href: "/admin/announcements", label: "Pengumuman", icon: <IconMegaphone size={16} /> },
-  { href: "/admin/campaigns", label: "Kempen", icon: <IconWallet size={16} /> },
-  { href: "/admin/donations", label: "Derma", icon: <IconCreditCard size={16} /> },
-  { href: "/admin/complaints", label: "Aduan", icon: <IconClipboard size={16} /> },
+  { href: "/admin", label: "Overview", icon: "dashboard" },
+  { href: "/admin/announcements", label: "Announcements", icon: "campaign" },
+  { href: "/admin/campaigns", label: "Campaigns", icon: "flag" },
+  { href: "/admin/donations", label: "Donations", icon: "volunteer_activism" },
+  { href: "/admin/complaints", label: "Complaints", icon: "report_problem" },
+  { href: "/admin/settings", label: "Settings", icon: "settings" },
 ];
 
 export default function AdminLayout({
@@ -27,98 +20,95 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-screen bg-background-dark text-slate-100 font-sans overflow-hidden">
-      {/* Sidebar — desktop */}
-      <aside className="hidden md:flex flex-col w-64 bg-surface-darker border-r border-[#3a3528] justify-between shrink-0 h-screen overflow-y-auto">
-        <div className="flex flex-col gap-6 p-6">
-          {/* Brand */}
-          <div className="flex items-center gap-3">
-            <div
-              className="h-10 w-10 rounded-full bg-cover bg-center shrink-0 border border-primary/30"
-              style={{
-                backgroundImage:
-                  "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-RxdveUt--Z7wsgn0NhiYl0wm6ci4vUBAOQ9i5bquUGzzy_D5upA4PHJ6o940oxhjqFVSzG_r2-BzpbMRKwbB_lGaJW-RzVOOm2BIy4Dl_QpYRtUio206tOPBNGt1jJ9DMHHlV7AEfwAnM2tigBJrDK6d4hKNkyeBJwdJn0sLynoN3upX3lo9DDJkXIiNvVLHfQajioBXn5BgQPy7aVwI8U0USddodhdqXAkSeIuq_pUgTWjbLlALUVtnVPLF5_BDXtSIo9oOsvI')",
-              }}
-            ></div>
-            <div className="flex flex-col">
-              <h1 className="text-white text-base font-semibold leading-tight">
-                Masjid Zahir
-              </h1>
-              <p className="text-primary text-xs font-medium tracking-wide uppercase">
-                Admin Portal
-              </p>
-            </div>
+    <div className="flex h-screen bg-background-dark text-slate-100 font-sans overflow-hidden">
+      {/* Sidebar */}
+      <aside className="w-20 lg:w-64 flex flex-col border-r border-[#333333] bg-[#1A1A1A] shrink-0 h-screen sticky top-0 transition-all duration-300 z-30">
+        <div className="p-6 flex items-center gap-4 justify-center lg:justify-start">
+          <div 
+            className="size-10 bg-center bg-no-repeat bg-cover rounded-full shadow-lg border border-primary/20 shrink-0" 
+            style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCRIlF417Nrsn469D9Vxq4hcQUuj9oMKcTDMAl6Q3AA2vw2PSBCUCeqA9DzjIy0V36TooicVau1Snvn84FYUJUs5rtWrKun3jKsV9fu0gf87ym_oGb5bd0OFsrWa94XbCQV6u6XGfMHC6yTfzXTJKHatHYiyiy2SSfyyQOoqw06QXjkVsePuZCY1R5_g1_lXvA2M3j2OJLbDhro9UueZ3L2fUtWjmtJ-xoxxetXClr1Nw9dlfVakQ2Q1fDyamy5DT4nmYHfM7CFKf0")' }}
+          ></div>
+          <div className="hidden lg:flex flex-col">
+            <h1 className="text-white text-base font-semibold leading-tight tracking-wide font-serif">
+              MASJID ZAHIR
+            </h1>
+            <p className="text-[#8a7e58] text-[10px] font-medium uppercase tracking-[0.15em] mt-1">
+              Executive
+            </p>
           </div>
-
-          {/* Navigation */}
-          <nav className="flex flex-col gap-2 mt-2">
-            {adminLinks.map((link) => {
-              const isActive =
-                link.href === "/admin"
-                  ? pathname === "/admin"
-                  : pathname?.startsWith(link.href);
-
-              // Map icons to Material Symbols
-              const iconMap: Record<string, string> = {
-                Dashboard: "dashboard",
-                Pengumuman: "announcement",
-                Kempen: "campaign",
-                Derma: "volunteer_activism",
-                Aduan: "chat_bubble",
-              };
-              const iconName = iconMap[link.label] || "circle";
-
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${
-                    isActive
-                      ? "bg-primary/10 text-primary border border-primary/20"
-                      : "text-text-admin-muted hover:bg-surface-dark hover:text-white"
-                  }`}
-                >
-                  <span
-                    className={`material-symbols-outlined ${
-                      isActive ? "filled" : ""
-                    } transition-colors ${
-                      isActive ? "text-primary" : "text-text-admin-muted group-hover:text-primary"
-                    }`}
-                  >
-                    {iconName}
-                  </span>
-                  <span className="text-sm font-medium">{link.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
         </div>
 
-        {/* User Profile */}
-        <div className="p-4 border-t border-[#3a3528]">
-          <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-surface-dark cursor-pointer transition-colors group">
-            <div className="h-9 w-9 rounded-full bg-slate-700 overflow-hidden ring-1 ring-white/10 group-hover:ring-primary/30">
-              <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ5W_jNMw5_K6Zfq7_F2LbJ7Z40cqPgZe5gSWISQJSMEe9A9L2R8jqPZpz1w6g1SRETC58BuGKDhutbcAAGASvFzZqIOUhBUqUF_uMCr3rqe0S46lSjJTmuJRS0etrCEcEeQl8GPRS0XPqPf7u7mzEYp0vqbKoS_xZgeEeKWtOj2tj0Zs2AgZUppLvti4eWgO-oKhcvEUZ3YWeghDknGVM_FDtAqs1c9txAbitmVOP5ulOGlGSpUu-KnICvwdEXBh4YQT3-BQICWY"
-                alt="Admin Profile"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col overflow-hidden">
-              <p className="text-white text-sm font-medium truncate">
-                Ustaz Ahmad
-              </p>
-              <p className="text-text-admin-muted text-xs truncate">
-                Super Admin
-              </p>
-            </div>
-          </div>
+        <nav className="flex-1 flex flex-col gap-1 px-3 py-6 overflow-y-auto">
+          {adminLinks.map((link) => {
+            const isActive = link.href === "/admin" 
+              ? pathname === "/admin" 
+              : pathname?.startsWith(link.href);
+            
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-4 px-3 py-3 rounded-lg transition-all border-l-2 group ${
+                  isActive
+                    ? "bg-primary/10 text-primary border-primary"
+                    : "text-[#888888] hover:bg-[#252525] hover:text-slate-200 border-transparent"
+                }`}
+              >
+                <span className={`material-symbols-outlined font-light text-[22px] ${isActive ? 'filled' : ''}`}>
+                  {link.icon}
+                </span>
+                <span className="hidden lg:block text-sm font-medium tracking-wide">
+                  {link.label}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="p-4 mt-auto border-t border-[#333333]">
+          <Link 
+            href="/"
+            className="flex items-center gap-4 px-3 py-3 rounded-lg text-[#888888] hover:bg-red-900/10 hover:text-red-400 transition-colors"
+          >
+            <span className="material-symbols-outlined font-light text-[22px]">logout</span>
+            <span className="hidden lg:block text-sm font-medium tracking-wide">Sign Out</span>
+          </Link>
         </div>
       </aside>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-background-dark relative">
-        <div className="flex-1 overflow-y-auto">{children}</div>
+      {/* Main content wrapper */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#111111]">
+        {/* Header */}
+        <header className="sticky top-0 z-20 bg-[#111111]/95 backdrop-blur-sm px-10 py-8 flex justify-between items-center border-b border-transparent shrink-0">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs text-primary font-medium tracking-widest uppercase mb-1">
+              {pathname === '/admin' ? 'Overview' : (pathname?.split('/').pop() || '')}
+            </p>
+            <h2 className="text-3xl font-serif font-medium text-white tracking-tight">
+              {pathname === '/admin' ? 'Dashboard' : ((pathname?.split('/').pop()?.charAt(0).toUpperCase() || '') + (pathname?.split('/').pop()?.slice(1) || ''))}
+            </h2>
+          </div>
+          <div className="flex items-center gap-6 text-slate-100">
+            <button className="relative p-2 text-[#888888] hover:text-primary transition-colors">
+              <span className="material-symbols-outlined font-light text-[24px]">notifications</span>
+              <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-primary rounded-full ring-2 ring-[#111111]"></span>
+            </button>
+            <div className="h-6 w-[1px] bg-[#333333]"></div>
+            <div className="flex items-center gap-4">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium text-slate-200">Administrator</p>
+                <p className="text-xs text-[#888888]">Masjid Zahir</p>
+              </div>
+              <div className="w-10 h-10 rounded-full border border-[#333333] bg-[#1A1A1A] flex items-center justify-center text-primary font-serif font-bold text-lg shadow-sm">
+                A
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto px-10 py-6 max-w-[1920px] w-full mx-auto">
+          {children}
+        </main>
       </div>
     </div>
   );
