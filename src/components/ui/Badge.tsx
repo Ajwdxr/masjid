@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 
 interface BadgeProps {
-  variant?: "gold" | "emerald" | "danger" | "warning" | "muted";
+  variant?: "gold" | "emerald" | "danger" | "warning" | "muted" | "success";
   children: React.ReactNode;
   className?: string;
 }
@@ -13,6 +13,7 @@ const variants = {
   emerald: "bg-emerald/15 text-emerald-light border-emerald/20",
   danger: "bg-danger/15 text-danger border-danger/20",
   warning: "bg-warning/15 text-warning border-warning/20",
+  success: "bg-emerald/15 text-emerald-light border-emerald/20",
   muted: "bg-dark-surface text-light-muted border-dark-border",
 };
 

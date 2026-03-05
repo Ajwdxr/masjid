@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 const adminLinks = [
   { href: "/admin", label: "Overview", icon: "dashboard" },
+  { href: "/admin/mosque-profile", label: "Mosque Profile", icon: "mosque" },
   { href: "/admin/announcements", label: "Announcements", icon: "campaign" },
   { href: "/admin/campaigns", label: "Campaigns", icon: "flag" },
   { href: "/admin/donations", label: "Donations", icon: "volunteer_activism" },
