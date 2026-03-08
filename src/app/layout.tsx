@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { Footer } from "@/components/layout/Footer";
+import { LoadingScreen } from "@/components/layout/LoadingScreen";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -42,6 +43,10 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Masjid Zahir" }],
   manifest: "/manifest.json",
+  icons: {
+    icon: "/logo.jpg",
+    apple: "/logo.jpg",
+  },
 };
 
 export const viewport: Viewport = {
@@ -66,6 +71,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} ${playfair.variable} font-sans antialiased islamic-pattern min-h-screen`}
       >
+        <LoadingScreen />
         <Navbar />
         <main className="min-h-screen pb-20 md:pb-0">{children}</main>
         <Footer />

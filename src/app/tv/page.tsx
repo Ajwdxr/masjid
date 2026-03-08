@@ -66,6 +66,7 @@ export default function TVPage() {
   const [gregorianDate, setGregorianDate] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [scales, setScales] = useState({ x: 1, y: 1 });
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const baseWidth = 1920;
   const baseHeight = 1080;
@@ -146,11 +147,113 @@ export default function TVPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // ─── Transmission Countdown Logic ───
+  const [transmission, setTransmission] = useState<{
+    type: "BEFORE" | "AZAN" | "AFTER";
+    prayer: PrayerTime;
+    remaining: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const checkTransmission = () => {
+      const now = new Date();
+      const currentTime = now.getTime();
+      let activeTransmission = null;
+
+      // Filter to relevant prayers (Subuh, Zohor, Asar, Maghrib, Isyak)
+      const mainPrayers = prayers.filter(
+        (p) => !["Imsak", "Syuruk"].includes(p.name)
+      );
+
+      for (const prayer of mainPrayers) {
+        const [h, m] = prayer.time.split(":").map(Number);
+        const pTime = new Date();
+        pTime.setHours(h, m, 0, 0);
+        const pTimeMs = pTime.getTime();
+
+        // 1. BEFORE (1 min before masuk waktu)
+        if (currentTime >= pTimeMs - 60000 && currentTime < pTimeMs) {
+          activeTransmission = {
+            type: "BEFORE" as const,
+            prayer,
+            remaining: Math.ceil((pTimeMs - currentTime) / 1000),
+          };
+          break;
+        }
+
+        // 2. AZAN (10s beeping + 2 mins 30s display) = 160 seconds total
+        if (currentTime >= pTimeMs && currentTime < pTimeMs + 160000) {
+          activeTransmission = {
+            type: "AZAN" as const,
+            prayer,
+            remaining: Math.ceil((pTimeMs + 160000 - currentTime) / 1000),
+          };
+          break;
+        }
+
+        // 3. AFTER (Iqamah countdown - 10 mins) = 600 seconds
+        if (currentTime >= pTimeMs + 160000 && currentTime <= pTimeMs + 760000) {
+          activeTransmission = {
+            type: "AFTER" as const,
+            prayer,
+            remaining: Math.ceil((pTimeMs + 760000 - currentTime) / 1000),
+          };
+          break;
+        }
+      }
+      setTransmission(activeTransmission);
+    };
+
+    const interval = setInterval(checkTransmission, 1000);
+    return () => clearInterval(interval);
+  }, [prayers]);
+
+  // ─── Play Alarm Sound when Masuk Waktu (Ring 10 times) ───
+  useEffect(() => {
+    // Start beeping immediately when state transitions to AZAN
+    if (transmission?.type === "AZAN" && transmission.remaining >= 159) {
+      let count = 0;
+      const playAlarm = () => {
+        if (count >= 10) return;
+        
+        const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+        audio.volume = 0.5;
+        audio.play().catch(e => console.error("Audio playback prevented by browser:", e));
+        
+        count++;
+        setTimeout(playAlarm, 1000); // Ring 10 times over 10 seconds
+      };
+      
+      playAlarm();
+    }
+  }, [transmission?.type, transmission?.remaining]);
+
   const displayPrayers = prayers.filter((p: PrayerTime) => p.name !== "Imsak");
   const currentAnn = mockAnnouncements[currentSlide];
 
   return (
     <div className="fixed inset-0 bg-background-dark overflow-hidden z-[100]">
+      {/* ─── Interaction Gate (Force Audio) ─── */}
+      {!hasInteracted && (
+        <div 
+          className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-10 text-center"
+          onClick={() => setHasInteracted(true)}
+        >
+          <div className="size-32 bg-primary/20 rounded-full flex items-center justify-center mb-8 border border-primary/40 animate-pulse">
+            <span className="material-symbols-outlined text-primary text-6xl">graphic_eq</span>
+          </div>
+          <h2 className="text-4xl font-serif font-bold text-white mb-4">Aktifkan Audio TV</h2>
+          <p className="text-slate-400 text-lg max-w-md mb-10">
+            Sila klik di mana-mana sahaja untuk memulakan paparan dan mengaktifkan bunyi amaran waktu solat.
+          </p>
+          <button 
+            className="px-10 py-4 bg-primary text-black font-bold uppercase tracking-widest rounded-full hover:scale-110 transition-transform cursor-pointer shadow-[0_0_30px_rgba(200,169,81,0.3)]"
+          >
+            Mula Paparan
+          </button>
+        </div>
+      )}
+
       <div 
         style={{
           width: `${baseWidth}px`,
@@ -158,8 +261,71 @@ export default function TVPage() {
           transform: `scale(${scales.x}, ${scales.y})`,
           transformOrigin: "top left",
         }}
-        className="text-slate-100 font-sans flex flex-col overflow-hidden selection:bg-primary selection:text-black shrink-0"
+        className="text-slate-100 font-sans flex flex-col overflow-hidden selection:bg-primary selection:text-black shrink-0 relative"
       >
+        {/* ─── Transmission Overlay ─── */}
+        {transmission && (
+          <div className="absolute inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center animate-fade-in">
+            {/* Decorative background */}
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/30 via-transparent to-transparent"></div>
+            
+            <div className="relative z-10 text-center space-y-12">
+              <div className="size-40 bg-primary/10 rounded-full flex items-center justify-center mx-auto border border-primary/20 animate-pulse">
+                <span className="material-symbols-outlined text-primary text-8xl">
+                  {transmission.type === "BEFORE" ? "notifications_active" : transmission.type === "AZAN" ? "volume_up" : "auto_timer"}
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-primary text-3xl uppercase tracking-[0.5em] font-black">
+                  {transmission.type === "BEFORE" ? "Akan Masuk Waktu" : transmission.type === "AZAN" ? "Sedang Berkumandang" : "Iqamah"}
+                </p>
+                <h2 className="text-9xl font-serif font-black text-white uppercase italic drop-shadow-2xl">
+                  {transmission.type === "AZAN" ? "AZAN" : transmission.prayer.nameMs}
+                </h2>
+              </div>
+
+              {transmission.type !== "AZAN" ? (
+                <div className="flex items-center justify-center gap-12 py-12 px-24 bg-white/5 border-y border-white/10 backdrop-blur-sm">
+                  <div className="flex flex-col items-center">
+                    <span className="text-[14rem] font-serif font-medium text-white leading-none tabular-nums">
+                      {String(Math.floor(transmission.remaining / 60)).padStart(2, "0")}
+                    </span>
+                    <span className="text-2xl text-primary/60 mt-6 uppercase tracking-[0.4em] font-bold">
+                      Minit
+                    </span>
+                  </div>
+                  <span className="text-[10rem] text-primary/20 font-serif font-light -translate-y-10 animate-pulse">:</span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-[14rem] font-serif font-medium text-white leading-none tabular-nums">
+                      {String(transmission.remaining % 60).padStart(2, "0")}
+                    </span>
+                    <span className="text-2xl text-primary/60 mt-6 uppercase tracking-[0.4em] font-bold">
+                      Saat
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-20 px-24 bg-white/5 border-y border-white/10 backdrop-blur-sm">
+                  <p className="text-5xl font-serif italic text-slate-300">
+                    Sila dengarkan Azan {transmission.prayer.nameMs} dengan penuh khusyuk
+                  </p>
+                </div>
+              )}
+
+              <div className="pt-8 block">
+                <p className="text-slate-400 text-2xl tracking-[0.2em] uppercase font-semibold">
+                  {transmission.type === "BEFORE" 
+                    ? "Sila kosongkan saf dan matikan telefon bimbit" 
+                    : transmission.type === "AZAN"
+                    ? "Jawablah laungan Azan dengan sempurna"
+                    : "Sila bersedia untuk menunaikan solat berjemaah"}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <header className="flex flex-col items-center justify-center pt-8 pb-6 bg-gradient-to-b from-[#1a1814] to-background-dark shrink-0 relative z-20 border-b border-primary/10">
           <div className="absolute left-10 top-1/2 -translate-y-1/2 flex items-center gap-5">
             <div className="size-20 bg-gradient-to-br from-primary/20 to-transparent rounded-full flex items-center justify-center p-0.5 border border-primary/40 shadow-[0_0_15px_rgba(212,175,55,0.15)]">

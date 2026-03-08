@@ -72,8 +72,12 @@ export default async function HomePage() {
       
       {/* ─── Hero / Branding ─── */}
       <section className="text-center pt-4 pb-2 animate-fade-in">
-        <div className="w-20 h-20 mx-auto rounded-2xl gold-gradient flex items-center justify-center text-dark text-3xl font-bold font-[family-name:var(--font-poppins)] shadow-2xl mb-4">
-          Z
+        <div className="w-20 h-20 mx-auto rounded-2xl gold-gradient overflow-hidden flex items-center justify-center shadow-2xl mb-4">
+          <img 
+            src="/logo.jpg" 
+            alt="Masjid Zahir Logo" 
+            className="w-full h-full object-cover"
+          />
         </div>
         <h1 className="text-3xl md:text-4xl font-bold font-[family-name:var(--font-poppins)] gold-text">
           Masjid Zahir
