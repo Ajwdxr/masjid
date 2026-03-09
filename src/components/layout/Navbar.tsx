@@ -11,7 +11,10 @@ import {
   IconGrid,
   IconTv,
   IconMosque,
+  IconLogOut,
+  IconUser,
 } from "@/components/ui/Icons";
+import { useAuth } from "@/components/layout/AuthProvider";
 
 const navLinks = [
   { href: "/", label: "Utama", icon: <IconHome size={16} /> },
@@ -19,12 +22,12 @@ const navLinks = [
   { href: "/announcements", label: "Pengumuman", icon: <IconMegaphone size={16} /> },
   { href: "/infaq", label: "Infaq", icon: <IconWallet size={16} /> },
   { href: "/aduan", label: "Aduan", icon: <IconClipboard size={16} /> },
-  { href: "/admin", label: "Admin", icon: <IconGrid size={16} /> },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const { session, loading, signOut, isAdmin, isVisitor, profile } = useAuth();
 
   // Hide navbar on TV route
   if (pathname?.startsWith("/tv")) return null;
@@ -69,13 +72,60 @@ export function Navbar() {
                 </Link>
               );
             })}
-            <Link
-              href="/tv"
-              className="ml-2 px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium text-emerald-light border border-emerald/30 hover:bg-emerald/10 transition-all duration-200 flex items-center gap-1.5"
-            >
-              <IconTv size={14} />
-              TV
-            </Link>
+            
+            {/* Session dependent links */}
+            {!loading && (
+              <>
+                {session ? (
+                  <>
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className={`px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium transition-all duration-200 ${pathname?.startsWith("/admin")
+                            ? "bg-gold/10 text-gold border border-gold/20"
+                            : "text-light-muted hover:text-light hover:bg-dark-surface"
+                          }`}
+                      >
+                        Admin
+                      </Link>
+                    )}
+                    {isVisitor && (
+                      <Link
+                        href="/visitor/profile"
+                        className={`px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium transition-all duration-200 ${pathname === "/visitor/profile"
+                            ? "bg-gold/10 text-gold border border-gold/20"
+                            : "text-light-muted hover:text-light hover:bg-dark-surface"
+                          }`}
+                      >
+                        Profil Saya
+                      </Link>
+                    )}
+                    <Link
+                      href="/tv"
+                      className="px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium text-emerald-light border border-emerald/30 hover:bg-emerald/10 transition-all duration-200 flex items-center gap-1.5"
+                    >
+                      <IconTv size={14} />
+                      TV
+                    </Link>
+                    <button
+                      onClick={() => signOut()}
+                      className="px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium text-red-400 hover:bg-red-400/10 transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <IconLogOut size={14} />
+                      Keluar
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium text-gold border border-gold/30 hover:bg-gold/10 transition-all duration-200 flex items-center gap-1.5"
+                  >
+                    <IconUser size={14} />
+                    Log Masuk
+                  </Link>
+                )}
+              </>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -121,14 +171,68 @@ export function Navbar() {
                 </Link>
               );
             })}
-            <Link
-              href="/tv"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium text-emerald-light hover:bg-emerald/10 transition-all"
-            >
-              <IconTv size={16} />
-              TV Display
-            </Link>
+
+            {!loading && (
+              <>
+                {session ? (
+                  <>
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium transition-all ${pathname?.startsWith("/admin")
+                            ? "bg-gold/10 text-gold"
+                            : "text-light-muted hover:text-light hover:bg-dark-surface"
+                          }`}
+                      >
+                        <IconGrid size={16} />
+                        Admin
+                      </Link>
+                    )}
+                    {isVisitor && (
+                      <Link
+                        href="/visitor/profile"
+                        onClick={() => setIsOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium transition-all ${pathname === "/visitor/profile"
+                            ? "bg-gold/10 text-gold"
+                            : "text-light-muted hover:text-light hover:bg-dark-surface"
+                          }`}
+                      >
+                        <IconUser size={16} />
+                        Profil Saya
+                      </Link>
+                    )}
+                    <Link
+                      href="/tv"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium text-emerald-light hover:bg-emerald/10 transition-all"
+                    >
+                      <IconTv size={16} />
+                      TV Display
+                    </Link>
+                    <button
+                      onClick={() => {
+                        signOut();
+                        setIsOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium text-red-400 hover:bg-red-400/10 transition-all cursor-pointer"
+                    >
+                      <IconLogOut size={16} />
+                      Log Keluar
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium text-gold border border-gold/10 hover:bg-gold/10 transition-all font-semibold"
+                  >
+                    <IconUser size={16} />
+                    Log Masuk
+                  </Link>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>

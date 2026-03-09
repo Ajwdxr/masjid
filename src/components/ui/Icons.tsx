@@ -58,6 +58,15 @@ export const IconCalendar = (props: IconProps) =>
     props
   );
 
+export const IconMail = (props: IconProps) =>
+  wrap(
+    <>
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </>,
+    props
+  );
+
 export const IconMoon = (props: IconProps) =>
   wrap(<path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />, props);
 
@@ -201,6 +210,9 @@ export const IconTrash = (props: IconProps) =>
 
 export const IconCheck = (props: IconProps) =>
   wrap(<polyline points="20 6 9 17 4 12" />, props);
+
+export const IconHeart = (props: IconProps) =>
+  wrap(<path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />, props);
 
 export const IconArrowRight = (props: IconProps) =>
   wrap(
@@ -371,6 +383,23 @@ export const IconExternalLink = (props: IconProps) =>
       <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
       <polyline points="15 3 21 3 21 9" />
       <line x1="10" y1="14" x2="21" y2="3" />
+    </>
+    , props);
+
+export const IconLock = (props: IconProps) =>
+  wrap(
+    <>
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0110 0v4" />
+    </>
+    , props);
+
+export const IconLogOut = (props: IconProps) =>
+  wrap(
+    <>
+      <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
     </>
     , props);
 

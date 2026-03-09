@@ -1,7 +1,12 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/components/layout/AuthProvider";
+import { useEffect } from "react";
+
 const adminLinks = [
   { href: "/admin", label: "Overview", icon: "dashboard" },
   { href: "/admin/mosque-profile", label: "Mosque Profile", icon: "mosque" },
@@ -18,6 +23,24 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { session, loading, signOut } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !session) {
+      router.push("/login");
+    }
+  }, [session, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background-dark flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!session) return null;
 
   return (
     <div className="flex h-screen bg-background-dark text-slate-100 font-sans overflow-hidden">
@@ -66,13 +89,13 @@ export default function AdminLayout({
         </nav>
 
         <div className="p-4 mt-auto border-t border-[#333333]">
-          <Link 
-            href="/"
-            className="flex items-center gap-4 px-3 py-3 rounded-lg text-[#888888] hover:bg-red-900/10 hover:text-red-400 transition-colors"
+          <button 
+            onClick={() => signOut()}
+            className="w-full flex items-center gap-4 px-3 py-3 rounded-lg text-[#888888] hover:bg-red-900/10 hover:text-red-400 transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined font-light text-[22px]">logout</span>
             <span className="hidden lg:block text-sm font-medium tracking-wide">Sign Out</span>
-          </Link>
+          </button>
         </div>
       </aside>
 

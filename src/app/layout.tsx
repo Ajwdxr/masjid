@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { Footer } from "@/components/layout/Footer";
 import { LoadingScreen } from "@/components/layout/LoadingScreen";
+import { AuthProvider } from "@/components/layout/AuthProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -71,11 +72,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} ${playfair.variable} font-sans antialiased islamic-pattern min-h-screen`}
       >
-        <LoadingScreen />
-        <Navbar />
-        <main className="min-h-screen pb-20 md:pb-0">{children}</main>
-        <Footer />
-        <MobileNav />
+        <AuthProvider>
+          <LoadingScreen />
+          <Navbar />
+          <main className="min-h-screen pb-20 md:pb-0">{children}</main>
+          <Footer />
+          <MobileNav />
+        </AuthProvider>
       </body>
     </html>
   );
