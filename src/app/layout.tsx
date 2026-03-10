@@ -6,6 +6,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { Footer } from "@/components/layout/Footer";
 import { LoadingScreen } from "@/components/layout/LoadingScreen";
 import { AuthProvider } from "@/components/layout/AuthProvider";
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -78,6 +79,7 @@ export default function RootLayout({
           <main className="min-h-screen pb-20 md:pb-0">{children}</main>
           <Footer />
           <MobileNav />
+          <Analytics />
         </AuthProvider>
       </body>
     </html>
