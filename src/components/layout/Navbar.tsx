@@ -22,6 +22,7 @@ const navLinks = [
   { href: "/announcements", label: "Pengumuman", icon: <IconMegaphone size={16} /> },
   { href: "/infaq", label: "Infaq", icon: <IconWallet size={16} /> },
   { href: "/aduan", label: "Aduan", icon: <IconClipboard size={16} /> },
+  { href: "/visitor/profile", label: "Profil", icon: <IconUser size={16} /> },
 ];
 
 export function Navbar() {
@@ -39,9 +40,9 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl gold-gradient overflow-hidden flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-              <img 
-                src="/logo.jpg" 
-                alt="Logo" 
+              <img
+                src="/logo.jpg"
+                alt="Logo"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -64,15 +65,15 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium transition-all duration-200 ${isActive
-                      ? "bg-gold/10 text-gold border border-gold/20"
-                      : "text-light-muted hover:text-light hover:bg-dark-surface"
+                    ? "bg-gold/10 text-gold border border-gold/20"
+                    : "text-light-muted hover:text-light hover:bg-dark-surface"
                     }`}
                 >
                   {link.label}
                 </Link>
               );
             })}
-            
+
             {/* Session dependent links */}
             {!loading && (
               <>
@@ -82,22 +83,11 @@ export function Navbar() {
                       <Link
                         href="/admin"
                         className={`px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium transition-all duration-200 ${pathname?.startsWith("/admin")
-                            ? "bg-gold/10 text-gold border border-gold/20"
-                            : "text-light-muted hover:text-light hover:bg-dark-surface"
+                          ? "bg-gold/10 text-gold border border-gold/20"
+                          : "text-light-muted hover:text-light hover:bg-dark-surface"
                           }`}
                       >
                         Admin
-                      </Link>
-                    )}
-                    {isVisitor && (
-                      <Link
-                        href="/visitor/profile"
-                        className={`px-4 py-2 rounded-[var(--radius-btn)] text-sm font-medium transition-all duration-200 ${pathname === "/visitor/profile"
-                            ? "bg-gold/10 text-gold border border-gold/20"
-                            : "text-light-muted hover:text-light hover:bg-dark-surface"
-                          }`}
-                      >
-                        Profil Saya
                       </Link>
                     )}
                     <Link
@@ -162,8 +152,8 @@ export function Navbar() {
                   href={link.href}
                   onClick={() => setIsOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium transition-all ${isActive
-                      ? "bg-gold/10 text-gold"
-                      : "text-light-muted hover:text-light hover:bg-dark-surface"
+                    ? "bg-gold/10 text-gold"
+                    : "text-light-muted hover:text-light hover:bg-dark-surface"
                     }`}
                 >
                   {link.icon}
@@ -181,25 +171,12 @@ export function Navbar() {
                         href="/admin"
                         onClick={() => setIsOpen(false)}
                         className={`flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium transition-all ${pathname?.startsWith("/admin")
-                            ? "bg-gold/10 text-gold"
-                            : "text-light-muted hover:text-light hover:bg-dark-surface"
+                          ? "bg-gold/10 text-gold"
+                          : "text-light-muted hover:text-light hover:bg-dark-surface"
                           }`}
                       >
                         <IconGrid size={16} />
                         Admin
-                      </Link>
-                    )}
-                    {isVisitor && (
-                      <Link
-                        href="/visitor/profile"
-                        onClick={() => setIsOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-[var(--radius-btn)] text-sm font-medium transition-all ${pathname === "/visitor/profile"
-                            ? "bg-gold/10 text-gold"
-                            : "text-light-muted hover:text-light hover:bg-dark-surface"
-                          }`}
-                      >
-                        <IconUser size={16} />
-                        Profil Saya
                       </Link>
                     )}
                     <Link

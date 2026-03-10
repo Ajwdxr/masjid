@@ -7,6 +7,7 @@ import {
   IconMegaphone,
   IconWallet,
   IconClipboard,
+  IconUser,
 } from "@/components/ui/Icons";
 
 const tabs = [
@@ -14,6 +15,7 @@ const tabs = [
   { href: "/announcements", label: "Info", icon: <IconMegaphone size={20} /> },
   { href: "/infaq", label: "Infaq", icon: <IconWallet size={20} /> },
   { href: "/aduan", label: "Aduan", icon: <IconClipboard size={20} /> },
+  { href: "/visitor/profile", label: "Profil", icon: <IconUser size={20} /> },
 ];
 
 export function MobileNav() {
@@ -31,9 +33,8 @@ export function MobileNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 transition-all ${
-                isActive ? "text-gold" : "text-light-muted"
-              }`}
+              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 transition-all ${isActive ? "text-gold" : "text-light-muted"
+                }`}
             >
               {tab.icon}
               <span className="text-[10px] font-medium">{tab.label}</span>

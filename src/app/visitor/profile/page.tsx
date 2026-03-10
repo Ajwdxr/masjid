@@ -2,17 +2,19 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/layout/AuthProvider";
+import Swal from "sweetalert2";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { 
-  IconUser, 
-  IconMail, 
-  IconCalendar, 
-  IconCheck, 
-  IconCreditCard, 
+import {
+  IconUser,
+  IconMail,
+  IconCalendar,
+  IconCheck,
+  IconCreditCard,
   IconHeart,
   IconClock
 } from "@/components/ui/Icons";
@@ -37,6 +39,7 @@ type Donation = {
 };
 
 export default function VisitorProfilePage() {
+  const router = useRouter();
   const { user, profile, loading: authLoading } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [donations, setDonations] = useState<Donation[]>([]);
@@ -46,8 +49,35 @@ export default function VisitorProfilePage() {
   useEffect(() => {
     if (user) {
       fetchData();
+    } else if (!authLoading) {
+      // Show SweetAlert for guest users
+      Swal.fire({
+        title: 'Akses Terhad',
+        text: 'Sila log masuk untuk melihat butiran profil anda.',
+        icon: 'info',
+        iconColor: '#D4AF37',
+        background: '#1a1a1a',
+        color: '#ffffff',
+        confirmButtonColor: '#D4AF37',
+        confirmButtonText: 'Log Masuk',
+        showCancelButton: true,
+        cancelButtonText: 'Kembali',
+        cancelButtonColor: '#333333',
+        customClass: {
+          popup: 'rounded-2xl border border-gold/20 shadow-2xl',
+          title: 'font-[family-name:var(--font-poppins)] gold-text',
+          confirmButton: 'rounded-xl font-bold px-6 py-3',
+          cancelButton: 'rounded-xl px-6 py-3'
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push('/login?redirect=/visitor/profile');
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          router.push('/');
+        }
+      });
     }
-  }, [user]);
+  }, [user, authLoading, router]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -100,7 +130,7 @@ export default function VisitorProfilePage() {
           .eq("user_id", user?.id)
           .eq("task_id", taskId)
           .eq("completed_at", today);
-        
+
         setTodayDeeds(todayDeeds.filter(id => id !== taskId));
       } else {
         // Add completion
@@ -113,7 +143,7 @@ export default function VisitorProfilePage() {
               completed_at: today
             }
           ]);
-        
+
         setTodayDeeds([...todayDeeds, taskId]);
       }
     } catch (err) {
@@ -131,11 +161,30 @@ export default function VisitorProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center space-y-4">
-        <div className="text-light-muted">Sila log masuk untuk melihat profil.</div>
-        <Link href="/login">
-          <Button variant="primary">Log Masuk</Button>
-        </Link>
+      <div className="min-h-[80vh] flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full text-center space-y-6 animate-fade-in">
+          <div className="w-20 h-20 bg-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gold/20">
+            <IconUser size={40} className="text-gold" />
+          </div>
+          <h1 className="text-3xl font-bold text-light font-[family-name:var(--font-poppins)]">
+            Akses Terhad
+          </h1>
+          <p className="text-light-muted leading-relaxed">
+            Sila log masuk ke akaun anda untuk melihat maklumat profil, sejarah amalan harian, dan rekod sumbangan anda.
+          </p>
+          <div className="flex flex-col gap-3 pt-4">
+            <Link href="/login?redirect=/visitor/profile" className="w-full">
+              <Button variant="primary" className="w-full py-6">
+                Log Masuk Sekarang
+              </Button>
+            </Link>
+            <Link href="/" className="w-full">
+              <Button variant="outline" className="w-full border-gold/20 text-gold hover:bg-gold/10">
+                Kembali ke Utama
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -143,7 +192,7 @@ export default function VisitorProfilePage() {
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 islamic-pattern">
       <div className="max-w-4xl mx-auto space-y-8">
-        
+
         {/* Profile Header */}
         <section className="animate-fade-in">
           <Card className="p-8 border-gold/10 bg-dark-surface/50 backdrop-blur-md relative overflow-hidden">
@@ -186,23 +235,20 @@ export default function VisitorProfilePage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {tasks.length > 0 ? tasks.map((task) => (
-                <Card 
+                <Card
                   key={task.id}
-                  className={`p-4 border-gold/10 transition-all cursor-pointer group hover:border-gold/30 ${
-                    todayDeeds.includes(task.id) ? "bg-gold/10 border-gold/40" : "bg-dark-surface/30"
-                  }`}
+                  className={`p-4 border-gold/10 transition-all cursor-pointer group hover:border-gold/30 ${todayDeeds.includes(task.id) ? "bg-gold/10 border-gold/40" : "bg-dark-surface/30"
+                    }`}
                   onClick={() => toggleDeed(task.id)}
                 >
                   <div className="flex items-start gap-4">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                      todayDeeds.includes(task.id) ? "bg-gold text-dark" : "bg-gold/10 text-gold"
-                    }`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${todayDeeds.includes(task.id) ? "bg-gold text-dark" : "bg-gold/10 text-gold"
+                      }`}>
                       <IconCheck size={20} />
                     </div>
                     <div className="flex-1">
-                      <h3 className={`font-semibold text-sm transition-colors ${
-                        todayDeeds.includes(task.id) ? "text-gold" : "text-light"
-                      }`}>
+                      <h3 className={`font-semibold text-sm transition-colors ${todayDeeds.includes(task.id) ? "text-gold" : "text-light"
+                        }`}>
                         {task.title}
                       </h3>
                       <p className="text-xs text-light-muted line-clamp-1">{task.description}</p>
@@ -228,8 +274,8 @@ export default function VisitorProfilePage() {
                   <span className="text-sm font-bold text-light">{todayDeeds.length}/{tasks.length}</span>
                 </div>
                 <div className="w-full h-1.5 bg-dark-surface rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gold transition-all duration-500" 
+                  <div
+                    className="h-full bg-gold transition-all duration-500"
                     style={{ width: `${(todayDeeds.length / tasks.length) * 100}%` }}
                   />
                 </div>

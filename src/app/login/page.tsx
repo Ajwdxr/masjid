@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { IconMosque, IconLock, IconUser } from "@/components/ui/Icons";
+import { IconMosque, IconLock, IconUser, IconGoogle } from "@/components/ui/Icons";
 
 export default function LoginPage() {
   const [isRegister, setIsRegister] = useState(false);
@@ -17,6 +17,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get("redirect") || "/";
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,10 +60,26 @@ export default function LoginPage() {
         setError(loginError.message);
         setLoading(false);
       } else {
-        // Redirect based on role (this will be handled by the layout typically, 
-        // but we can do a quick check or just go to home/admin)
-        router.push("/");
+        // Redirect based on role or to the specified redirect path
+        router.push(redirectPath);
       }
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      setError(err.message || 'Gagal untuk log masuk dengan Google');
+      setLoading(false);
     }
   };
 
@@ -72,14 +90,14 @@ export default function LoginPage() {
 
       <Card className="max-w-md w-full relative z-10 border border-gold/10 bg-dark-surface/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 gold-gradient opacity-50" />
-        
+
         <div className="text-center mb-8">
           <div className="w-20 h-20 mx-auto rounded-3xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-6 shadow-inner">
-             <img 
-               src="/logo.jpg" 
-               alt="Masjid Zahir Logo" 
-               className="w-16 h-16 object-cover rounded-2xl"
-             />
+            <img
+              src="/logo.jpg"
+              alt="Masjid Zahir Logo"
+              className="w-16 h-16 object-cover rounded-2xl"
+            />
           </div>
           <Badge variant="gold" className="mb-2">
             {isRegister ? "Pendaftaran Jemaah" : "Log Masuk Portal"}
@@ -88,7 +106,7 @@ export default function LoginPage() {
             {isRegister ? "Daftar Akaun" : "Selamat Datang"}
           </h1>
           <p className="text-light-muted text-sm mt-2">
-            {isRegister 
+            {isRegister
               ? "Sertai komuniti digital Masjid Zahir untuk menjejak amalan harian anda."
               : "Sila masukkan kredential anda untuk mengakses profil."}
           </p>
@@ -182,6 +200,25 @@ export default function LoginPage() {
             )}
           </Button>
 
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-dark-border"></span>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#111] px-4 text-light-muted/50 tracking-widest font-medium">Atau</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="w-full h-12 flex items-center justify-center gap-3 bg-white hover:bg-white/90 text-dark font-semibold rounded-2xl transition-all shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <IconGoogle />
+            <span>Log Masuk Google</span>
+          </button>
+
           <div className="text-center mt-6">
             <button
               type="button"
@@ -197,7 +234,7 @@ export default function LoginPage() {
           </div>
         </form>
       </Card>
-      
+
       <div className="absolute bottom-6 left-0 w-full text-center text-light-muted/40 text-[10px] uppercase tracking-[0.2em] font-medium">
         Powered by Zahir Digital &copy; 2026
       </div>

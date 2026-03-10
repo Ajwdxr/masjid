@@ -81,7 +81,7 @@ export default function TVPage() {
         y: sh / baseHeight
       });
     };
-    
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -215,15 +215,15 @@ export default function TVPage() {
       let count = 0;
       const playAlarm = () => {
         if (count >= 10) return;
-        
+
         const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
         audio.volume = 0.5;
         audio.play().catch(e => console.error("Audio playback prevented by browser:", e));
-        
+
         count++;
         setTimeout(playAlarm, 1000); // Ring 10 times over 10 seconds
       };
-      
+
       playAlarm();
     }
   }, [transmission?.type, transmission?.remaining]);
@@ -235,7 +235,7 @@ export default function TVPage() {
     <div className="fixed inset-0 bg-background-dark overflow-hidden z-[100]">
       {/* ─── Interaction Gate (Force Audio) ─── */}
       {!hasInteracted && (
-        <div 
+        <div
           className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-10 text-center"
           onClick={() => setHasInteracted(true)}
         >
@@ -246,7 +246,7 @@ export default function TVPage() {
           <p className="text-slate-400 text-lg max-w-md mb-10">
             Sila klik di mana-mana sahaja untuk memulakan paparan dan mengaktifkan bunyi amaran waktu solat.
           </p>
-          <button 
+          <button
             className="px-10 py-4 bg-primary text-black font-bold uppercase tracking-widest rounded-full hover:scale-110 transition-transform cursor-pointer shadow-[0_0_30px_rgba(200,169,81,0.3)]"
           >
             Mula Paparan
@@ -254,7 +254,7 @@ export default function TVPage() {
         </div>
       )}
 
-      <div 
+      <div
         style={{
           width: `${baseWidth}px`,
           height: `${baseHeight}px`,
@@ -268,7 +268,7 @@ export default function TVPage() {
           <div className="absolute inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center animate-fade-in">
             {/* Decorative background */}
             <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/30 via-transparent to-transparent"></div>
-            
+
             <div className="relative z-10 text-center space-y-12">
               <div className="size-40 bg-primary/10 rounded-full flex items-center justify-center mx-auto border border-primary/20 animate-pulse">
                 <span className="material-symbols-outlined text-primary text-8xl">
@@ -308,18 +308,18 @@ export default function TVPage() {
               ) : (
                 <div className="py-20 px-24 bg-white/5 border-y border-white/10 backdrop-blur-sm">
                   <p className="text-5xl font-serif italic text-slate-300">
-                    Sila dengarkan Azan {transmission.prayer.nameMs} dengan penuh khusyuk
+                    Azan {transmission.prayer.nameMs} Sedang Berkumandang
                   </p>
                 </div>
               )}
 
               <div className="pt-8 block">
                 <p className="text-slate-400 text-2xl tracking-[0.2em] uppercase font-semibold">
-                  {transmission.type === "BEFORE" 
-                    ? "Sila kosongkan saf dan matikan telefon bimbit" 
+                  {transmission.type === "BEFORE"
+                    ? "Sila kosongkan saf dan matikan telefon bimbit"
                     : transmission.type === "AZAN"
-                    ? "Jawablah laungan Azan dengan sempurna"
-                    : "Sila bersedia untuk menunaikan solat berjemaah"}
+                      ? "Jawablah laungan Azan dengan sempurna"
+                      : "Sila bersedia untuk menunaikan solat berjemaah"}
                 </p>
               </div>
             </div>
@@ -433,23 +433,21 @@ export default function TVPage() {
                 return (
                   <div
                     key={prayer.name}
-                    className={`flex justify-between items-center px-6 py-4 border-b border-white/5 transition-all duration-500 ${
-                      isActive
+                    className={`flex justify-between items-center px-6 py-4 border-b border-white/5 transition-all duration-500 ${isActive
                         ? "bg-gradient-to-r from-primary to-[#bfa140] text-black shadow-lg shadow-black/50 relative my-1 transform scale-105 z-10"
                         : i % 2 === 0
-                        ? ""
-                        : "bg-white/[0.02]"
-                    }`}
+                          ? ""
+                          : "bg-white/[0.02]"
+                      }`}
                   >
                     {isActive && (
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-white"></div>
                     )}
                     <span
-                      className={`${
-                        isActive
+                      className={`${isActive
                           ? "font-bold text-xl"
                           : "text-slate-400 text-lg font-light"
-                      } uppercase tracking-widest`}
+                        } uppercase tracking-widest`}
                     >
                       {prayer.nameMs}
                     </span>
@@ -460,9 +458,8 @@ export default function TVPage() {
                         </span>
                       )}
                       <span
-                        className={`${
-                          isActive ? "font-bold text-4xl" : "text-slate-200 text-3xl"
-                        } font-serif tabular-nums`}
+                        className={`${isActive ? "font-bold text-4xl" : "text-slate-200 text-3xl"
+                          } font-serif tabular-nums`}
                       >
                         {prayer.time}
                       </span>
@@ -482,10 +479,9 @@ export default function TVPage() {
                 <div
                   className="w-full h-full bg-cover bg-center transition-transform duration-[20s] ease-linear scale-110"
                   style={{
-                    backgroundImage: `url('${
-                      currentAnn.image_url ||
+                    backgroundImage: `url('${currentAnn.image_url ||
                       "https://lh3.googleusercontent.com/aida-public/AB6AXuD7eKqx9Gje6MyYQSZLkhMK0jJ1O7O-cgQvfHZOVUyipbWTORPckmf0XLANHimDAYTSc-_vGAjgAGRxzNbNtvyB2D__wUMYWyDGR9xvWoPVawrUeVjsORrMsUBJRtvepOQopHb6-2Wu_XVYIAkIKGzRyl4wkXxA-6hUVA6jl7k5CPfVVBIKTRsUfYbXQiss-Q8gIj8WnZb0uOvFPqbb14mdnoTKNnsYPBGladXHGChe5vqBufFJHrdt6Jc5TUTIXmSFBlDA3G3jix8"
-                    }')`,
+                      }')`,
                   }}
                 ></div>
               </div>
