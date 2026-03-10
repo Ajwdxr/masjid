@@ -50,8 +50,10 @@ export default function TVPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Fetch real prayer times and announcements
+  // Fetch real prayer times, announcements, and settings
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [hadith, setHadith] = useState({ content: "The best among you are those who have the best manners and character.", source: "Sahih Bukhari" });
+  const [tickerItems, setTickerItems] = useState<string[]>([]);
 
   const refreshData = useCallback(async () => {
     try {
@@ -68,6 +70,16 @@ export default function TVPage() {
         .order('created_at', { ascending: false });
 
       if (annData) setAnnouncements(annData as Announcement[]);
+
+      // Fetch settings
+      const { data: settingsData } = await supabase
+        .from('settings')
+        .select('*');
+
+      settingsData?.forEach(item => {
+        if (item.key === 'hadith') setHadith(item.value);
+        if (item.key === 'tv_ticker') setTickerItems(item.value);
+      });
 
       setIsLoading(false);
     } catch (error) {
@@ -525,11 +537,10 @@ export default function TVPage() {
                 </div>
                 <div>
                   <p className="text-xl text-slate-200 font-serif italic leading-relaxed">
-                    "The best among you are those who have the best manners and
-                    character."
+                    "{hadith.content}"
                   </p>
                   <p className="text-primary/70 text-sm mt-2 font-medium uppercase tracking-wide">
-                    — Sahih Bukhari
+                    — {hadith.source}
                   </p>
                 </div>
               </div>
@@ -546,41 +557,19 @@ export default function TVPage() {
           </div>
           <div className="flex-1 overflow-hidden h-full flex items-center">
             <div className="marquee-content flex items-center gap-32 px-10 text-lg font-medium text-slate-300 animate-ticker whitespace-nowrap">
-              <div className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                <span>
-                  Masjid Expansion Fund:{" "}
-                  <span className="text-white">RM 187,500</span> raised of RM
-                  500,000 goal
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                <span>
-                  Weekend Quran Class registration is open until{" "}
-                  <span className="text-white">15 Mar</span>
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                <span>Please ensure phones are on silent mode during prayer</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                <span>
-                  Next community cleanup:{" "}
-                  <span className="text-white">Sunday 8:00 AM</span>
-                </span>
-              </div>
-              {/* Duplicate for seamless loop */}
-              <div className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                <span>
-                  Masjid Expansion Fund:{" "}
-                  <span className="text-white">RM 187,500</span> raised of RM
-                  500,000 goal
-                </span>
-              </div>
+              {tickerItems.length > 0 ? (
+                tickerItems.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                    <span>{item}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                  <span>Selamat Datang ke Masjid Zahir, Alor Setar</span>
+                </div>
+              )}
             </div>
           </div>
         </footer>
