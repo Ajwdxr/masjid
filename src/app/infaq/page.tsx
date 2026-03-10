@@ -15,6 +15,7 @@ import { supabase } from "@/lib/supabase";
 export default function InfaqPage() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [campaign, setCampaign] = useState<Campaign | null>(null);
+  const [donationQR, setDonationQR] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,6 +43,16 @@ export default function InfaqPage() {
           .limit(10);
         if (donationsData) setDonations(donationsData);
       }
+
+      // Fetch general donation QR fallback
+      const { data: settings } = await supabase
+        .from("settings")
+        .select("*")
+        .eq("key", "donation_qr")
+        .single();
+      
+      if (settings) setDonationQR(settings.value);
+
     } catch (err) {
       console.error("Fetch error:", err);
     } finally {
@@ -70,10 +81,29 @@ export default function InfaqPage() {
       </div>
 
       {!campaign ? (
-        <Card className="p-12 text-center border-dashed border-gold/20">
-          <IconWallet size={48} className="text-gold/20 mx-auto mb-4" />
-          <p className="text-light-muted italic">Tiada kempen infaq yang aktif buat masa ini.</p>
-        </Card>
+        <div className="space-y-6">
+          <Card className="p-12 text-center border-dashed border-gold/20">
+            <IconWallet size={48} className="text-gold/20 mx-auto mb-4" />
+            <p className="text-light-muted italic">Tiada kempen infaq yang aktif buat masa ini.</p>
+          </Card>
+
+          {donationQR && (
+            <Card className="p-8 text-center animate-fade-in border-gold/30 bg-gold/5">
+               <h3 className="text-lg font-bold gold-text uppercase tracking-widest mb-6 italic">Infaq Umum Ke Akaun Masjid</h3>
+               <div className="flex justify-center">
+                  <div className="p-4 bg-white rounded-3xl shadow-2xl shadow-gold/20 transition-transform hover:scale-105 duration-500">
+                    <img src={donationQR} alt="General Donation QR" className="w-64 h-64 object-contain" />
+                  </div>
+               </div>
+               <p className="text-xs text-light-muted mt-6 max-w-sm mx-auto leading-relaxed">
+                  Anda boleh terus mengimbas QR di atas untuk sumbangan umum (Infaq Jumaat/Penyelenggaraan).
+               </p>
+               <p className="text-[10px] text-gold/60 mt-2 font-bold uppercase tracking-widest">
+                  *Sokong TNG, DuitNow, dsb.
+               </p>
+            </Card>
+          )}
+        </div>
       ) : (
         <>
           <div className="max-w-2xl mx-auto space-y-6">

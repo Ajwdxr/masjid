@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Swal from "sweetalert2";
-import { IconLoader2 } from "@/components/ui/Icons";
+import { IconLoader2, IconUpload, IconImage, IconTrash, IconCheck } from "@/components/ui/Icons";
+import { uploadImage } from "@/lib/upload";
 
 interface HadithItem {
   content: string;
@@ -30,6 +31,9 @@ export default function SettingsPage() {
     fontSize: "large",
   });
 
+  const [donationQR, setDonationQR] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -51,6 +55,7 @@ export default function SettingsPage() {
         }
         if (item.key === "tv_ticker") setTickerItems(item.value);
         if (item.key === "tv_theme") setTvTheme(item.value);
+        if (item.key === "donation_qr") setDonationQR(item.value);
       });
     } catch (err) {
       console.error("Fetch error:", err);
@@ -58,6 +63,28 @@ export default function SettingsPage() {
       setLoading(false);
     }
   }
+
+  const handleQRUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      Swal.fire("Ralat", "Sila pilih fail imej sahaja.", "error");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const url = await uploadImage(file, "images", "general-qr");
+      setDonationQR(url);
+      await saveSetting("donation_qr", url, true);
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      Swal.fire("Ralat", "Gagal memuat naik imej.", "error");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   async function saveSetting(key: string, value: any, silent = false) {
     if (!silent) setSaving(true);
@@ -238,6 +265,79 @@ export default function SettingsPage() {
                 >
                   Tambah
                 </button>
+              </div>
+            </div>
+          </section>
+
+          {/* 4. General Donation QR Code */}
+          <section className="bg-[#1A1A1A] border border-[#333333] rounded-xl overflow-hidden shadow-sm">
+            <div className="px-8 py-5 border-b border-[#333333] flex items-center justify-between bg-[#222222]/30">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary text-xl">qr_code_2</span>
+                <h3 className="text-base font-medium text-slate-200 tracking-tight font-serif italic">
+                  General Donation QR Code
+                </h3>
+              </div>
+            </div>
+            <div className="p-8 flex flex-col items-center gap-6">
+              <div className="relative group">
+                <div className={`w-48 h-48 rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center bg-[#111111] overflow-hidden ${donationQR ? 'border-primary/50' : 'border-[#333333] hover:border-primary/50'}`}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleQRUpload}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                    disabled={isUploading}
+                  />
+                  
+                  {isUploading ? (
+                    <div className="flex flex-col items-center gap-2">
+                       <IconLoader2 className="animate-spin text-primary" size={32} />
+                       <span className="text-[10px] text-primary uppercase tracking-widest font-bold">Uploading...</span>
+                    </div>
+                  ) : donationQR ? (
+                    <>
+                      <img src={donationQR} alt="General Donation QR" className="w-full h-full object-contain p-2" />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="text-xs text-white font-bold uppercase tracking-widest text-center px-4">Tukar Imej QR</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3 text-[#555555] group-hover:text-primary transition-colors">
+                      <IconUpload size={48} />
+                      <div className="text-center">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#888888]">E-wallet QR Code</p>
+                        <p className="text-[8px] mt-1 text-[#666666] italic">Sokong TNG, DuitNow dsb.</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {donationQR && (
+                  <button
+                    onClick={() => {
+                      if (confirm('Padam QR code ini?')) {
+                        setDonationQR(null);
+                        saveSetting('donation_qr', null);
+                      }
+                    }}
+                    className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-red-500/80 backdrop-blur-md text-white flex items-center justify-center shadow-lg hover:bg-red-500 transition-all z-20 border border-white/20"
+                  >
+                    <IconTrash size={14} />
+                  </button>
+                )}
+              </div>
+              
+              <div className="text-center space-y-2">
+                <p className="text-[11px] text-[#888888] max-w-sm leading-relaxed">
+                  QR code ini akan dipaparkan secara <span className="text-primary italic">fallback</span> sekiranya tiada kempen yang sedang aktif.
+                </p>
+                {donationQR && (
+                  <div className="flex items-center justify-center gap-1.5 py-1.5 px-3 bg-primary/10 rounded-full border border-primary/20">
+                    <IconCheck size={12} className="text-primary" />
+                    <span className="text-[9px] font-bold text-primary uppercase tracking-widest">Sedia Dipaparkan</span>
+                  </div>
+                )}
               </div>
             </div>
           </section>

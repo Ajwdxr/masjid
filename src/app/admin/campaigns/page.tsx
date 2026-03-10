@@ -6,16 +6,19 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { IconWallet, IconEdit, IconTrash, IconPlus } from "@/components/ui/Icons";
+import { IconWallet, IconEdit, IconTrash, IconPlus, IconImage, IconLoader2, IconUpload } from "@/components/ui/Icons";
 import type { Campaign, CampaignFormData } from "@/types/campaign";
 import { formatCurrency, calcPercentage, formatShortDate } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import { uploadImage } from "@/lib/upload";
+import Swal from "sweetalert2";
 
 export default function AdminCampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState<CampaignFormData>({
     title: "",
     description: "",
@@ -25,6 +28,27 @@ export default function AdminCampaignsPage() {
     qr_code_url: null,
     payment_link: null,
   });
+
+  const handleQRUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      Swal.fire("Ralat", "Sila pilih fail imej sahaja.", "error");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const url = await uploadImage(file, "images", "campaign-qr");
+      setFormData((prev) => ({ ...prev, qr_code_url: url }));
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      Swal.fire("Ralat", err.message || "Gagal memuat naik imej.", "error");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   useEffect(() => {
     fetchCampaigns();
@@ -98,19 +122,41 @@ export default function AdminCampaignsPage() {
       
       fetchCampaigns();
       resetForm();
+      Swal.fire({
+        title: "Berjaya",
+        text: editingId ? "Kempen telah dikemaskini." : "Kempen baru telah dilancarkan.",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (err) {
       console.error("Submit error:", err);
+      Swal.fire("Ralat", "Gagal menyimpan kempen.", "error");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Adakah anda pasti mahu padam kempen ini?")) {
+    const result = await Swal.fire({
+      title: "Adakah anda pasti?",
+      text: "Anda tidak akan dapat mengembalikan kempen ini!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, padam!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
       try {
         const { error } = await supabase.from("campaigns").delete().eq("id", id);
         if (error) throw error;
+        
+        Swal.fire("Dipadam!", "Kempen telah dipadamkan.", "success");
         fetchCampaigns();
-      } catch (err) {
+      } catch (err: any) {
         console.error("Delete error:", err);
+        Swal.fire("Ralat!", "Gagal memadam kempen.", "error");
       }
     }
   };
@@ -210,6 +256,42 @@ export default function AdminCampaignsPage() {
                       }
                       className="bg-background-dark border border-[#3a3528] text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-3 placeholder-gray-600 focus:outline-none transition-all [color-scheme:dark]"
                     />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-text-admin-muted">
+                      Donation QR (Optional)
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <div className="relative h-[46px] w-[46px] rounded-lg bg-background-dark border border-dashed border-[#3a3528] overflow-hidden flex items-center justify-center group cursor-pointer hover:border-primary/50 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleQRUpload}
+                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                          disabled={isUploading}
+                        />
+                        {isUploading ? (
+                          <IconLoader2 size={16} className="animate-spin text-primary" />
+                        ) : formData.qr_code_url ? (
+                          <img
+                            src={formData.qr_code_url}
+                            alt="QR"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <IconUpload size={18} className="text-text-admin-muted group-hover:text-primary transition-colors" />
+                        )}
+                      </div>
+                      {formData.qr_code_url && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, qr_code_url: null })}
+                          className="text-[10px] text-red-500 hover:text-red-400 font-bold uppercase tracking-wider transition-colors"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">

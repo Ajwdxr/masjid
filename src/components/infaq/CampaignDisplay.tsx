@@ -80,6 +80,28 @@ export function CampaignDisplay({ campaign }: CampaignDisplayProps) {
         <p className="text-xs text-light-muted text-center">
           Tamat: {formatDate(campaign.end_date)}
         </p>
+
+        {/* Donation QR Code if available */}
+        {campaign.qr_code_url && (
+          <div className="pt-4 border-t border-dark-border/50">
+            <p className="text-xs font-bold text-center gold-text uppercase tracking-widest mb-4">
+              Imbas QR Untuk Infaq
+            </p>
+            <div className="flex justify-center">
+              <div className="p-3 bg-white rounded-2xl shadow-xl shadow-gold/10 group relative transition-transform hover:scale-105">
+                <div className="absolute inset-0 bg-gold/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <img 
+                  src={campaign.qr_code_url} 
+                  alt="Donation QR Code" 
+                  className="w-48 h-48 object-contain relative z-10"
+                />
+              </div>
+            </div>
+            <p className="text-[10px] text-light-muted text-center mt-4 italic">
+              *Sokong TNG eWallet, DuitNow QR & lain-lain
+            </p>
+          </div>
+        )}
       </div>
     </Card>
   );
