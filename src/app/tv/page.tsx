@@ -461,59 +461,74 @@ export default function TVPage() {
 
           {/* Right Column: Announcements & Hadith */}
           <div className="w-[68%] flex flex-col gap-6 h-full min-h-0 mt-6">
-            <div className="flex-1 bg-[#161410] overflow-hidden relative group border border-white/5 shadow-2xl">
+            <div className="flex-1 bg-[#161410] overflow-hidden relative group border border-white/5 shadow-2xl flex">
+              {/* Background Layer: Blurred Atmosphere */}
               <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10"></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30 z-10"></div>
                 <div
-                  className="w-full h-full bg-cover bg-center transition-transform duration-[20s] ease-linear scale-110"
+                  className="w-full h-full bg-cover bg-center blur-3xl opacity-30 transition-all duration-1000"
                   style={{
-                    backgroundImage: `url('${currentAnn.image_url ||
-                      "https://lh3.googleusercontent.com/aida-public/AB6AXuD7eKqx9Gje6MyYQSZLkhMK0jJ1O7O-cgQvfHZOVUyipbWTORPckmf0XLANHimDAYTSc-_vGAjgAGRxzNbNtvyB2D__wUMYWyDGR9xvWoPVawrUeVjsORrMsUBJRtvepOQopHb6-2Wu_XVYIAkIKGzRyl4wkXxA-6hUVA6jl7k5CPfVVBIKTRsUfYbXQiss-Q8gIj8WnZb0uOvFPqbb14mdnoTKNnsYPBGladXHGChe5vqBufFJHrdt6Jc5TUTIXmSFBlDA3G3jix8"
-                      }')`,
+                    backgroundImage: `url('${currentAnn.image_url || "https://images.unsplash.com/photo-1542668595-df7148530663?q=80&w=1920"}')`,
                   }}
-                ></div>
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#161410] via-transparent to-[#161410]/50 z-10"></div>
+                {!currentAnn.image_url && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#161410] via-[#161410]/40 to-transparent z-10"></div>
+                )}
               </div>
-              <div className="relative z-20 h-full flex flex-col justify-end p-12 max-w-3xl animate-fade-in" key={currentAnn.id}>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="h-px w-12 bg-primary"></div>
-                  <span className="text-primary font-bold uppercase tracking-[0.2em] text-sm">
-                    Pengumuman Masjid
-                  </span>
-                </div>
-                <h2 className="text-6xl font-bold text-white leading-tight mb-8 font-serif drop-shadow-lg">
-                  {currentAnn.title}
-                </h2>
-                <div className="flex items-center gap-12 pt-8 border-t border-white/10">
-                  <div className="max-w-md">
-                    <p className="text-slate-400 text-xs uppercase tracking-widest mb-1">
-                      Details
-                    </p>
-                    <p className="text-xl text-white font-serif line-clamp-2 leading-relaxed">
-                      {currentAnn.description}
-                    </p>
+
+              {/* Content Layer */}
+              <div className="relative z-20 w-full h-full flex animate-fade-in" key={currentAnn.id}>
+                {/* Text Side */}
+                <div className={`${currentAnn.image_url ? 'w-[55%]' : 'w-full'} flex flex-col justify-end p-12 transition-all duration-700`}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="h-px w-12 bg-primary"></div>
+                    <span className="text-primary font-black uppercase tracking-[0.3em] text-sm">
+                      Pengumuman Utama
+                    </span>
                   </div>
-                  {currentAnn.event_date && (
-                    <>
-                      <div className="w-px h-12 bg-white/20"></div>
-                      <div>
-                        <p className="text-slate-400 text-xs uppercase tracking-widest mb-1">
-                          Tarikh & Masa
+                  <h2 className={`${currentAnn.image_url ? 'text-5xl' : 'text-7xl'} font-bold text-white leading-tight mb-8 font-serif drop-shadow-2xl transition-all`}>
+                    {currentAnn.title}
+                  </h2>
+                  <div className="flex items-center gap-12 pt-8 border-t border-white/10">
+                    <div className="max-w-md">
+                      <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 opacity-50">
+                        Huraian
+                      </p>
+                      <p className={`${currentAnn.image_url ? 'text-xl' : 'text-2xl'} text-slate-200 font-serif line-clamp-3 leading-relaxed transition-all italic`}>
+                        "{currentAnn.description}"
+                      </p>
+                    </div>
+                    {currentAnn.event_date && (
+                      <div className="shrink-0">
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 opacity-50">
+                          Tarikh Acara
                         </p>
-                        <p className="text-2xl text-white font-serif">
+                        <p className="text-2xl text-primary font-serif font-black">
                           {new Date(currentAnn.event_date).toLocaleDateString("ms-MY", {
                             day: "numeric",
                             month: "short",
-                          })}{" "}
-                          <span className="text-primary text-lg align-middle mx-1">
-                            •
-                          </span>{" "}
-                          Selepas Maghrib
+                            year: "numeric"
+                          })}
                         </p>
                       </div>
-                    </>
-                  )}
+                    )}
+                  </div>
                 </div>
+
+                {/* Image Side (Fits without cropping) */}
+                {currentAnn.image_url && (
+                  <div className="w-[45%] h-full p-12 flex items-center justify-center">
+                    <div className="relative w-full h-full max-h-[80%] flex items-center justify-center">
+                      {/* Shadow/Glow effect behind image */}
+                      <div className="absolute inset-4 bg-primary/20 blur-3xl rounded-full"></div>
+                      <img
+                        src={currentAnn.image_url}
+                        alt=""
+                        className="relative z-10 max-w-full max-h-full object-contain rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-white/10 scale-105 animate-float"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
