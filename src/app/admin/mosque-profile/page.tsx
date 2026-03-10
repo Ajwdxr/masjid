@@ -127,21 +127,39 @@ export default function MosqueProfilePage() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            // Updated to be real integration later, but for now we simulate
-            const { error } = await supabase
+            // Check if we are using the mock ID "1"
+            const isMockId = profile.id === "1";
+
+            // Prepare data for upsert
+            const profileData: any = {
+                name: profile.name,
+                address: profile.address,
+                phone: profile.phone,
+                description: profile.description,
+                hero_image_url: profile.hero_image_url,
+                parking_capacity: profile.parking_capacity,
+                parking_available: profile.parking_available,
+                parking_notes: profile.parking_notes,
+                google_map_embed_url: profile.google_map_embed_url,
+                updated_at: new Date().toISOString()
+            };
+
+            // If it's not a mock ID, include the ID for updating the specific record
+            if (!isMockId) {
+                profileData.id = profile.id;
+            }
+
+            const { data, error } = await supabase
                 .from('mosque_profile')
-                .update({
-                    name: profile.name,
-                    address: profile.address,
-                    phone: profile.phone,
-                    description: profile.description,
-                    hero_image_url: profile.hero_image_url,
-                    parking_capacity: profile.parking_capacity,
-                    parking_available: profile.parking_available,
-                    parking_notes: profile.parking_notes,
-                    google_map_embed_url: profile.google_map_embed_url
-                })
-                .eq('id', profile.id);
+                .upsert(profileData)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            if (data) {
+                setProfile(data as MosqueProfile);
+            }
 
             if (error) throw error;
 
