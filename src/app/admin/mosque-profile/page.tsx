@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import {
@@ -43,6 +43,43 @@ export default function MosqueProfilePage() {
     ]);
     const [isUploading, setIsUploading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('mosque_profile')
+                    .select('*')
+                    .limit(1)
+                    .single();
+
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        // Table is empty, we keep default but set a real UUID placeholder if needed
+                        console.log('No mosque profile found, using initial state.');
+                    } else {
+                        throw error;
+                    }
+                }
+
+                if (data) {
+                    setProfile(data as MosqueProfile);
+                }
+            } catch (err: any) {
+                console.error('Initial fetch error:', err);
+                Swal.fire({
+                    title: 'Ralat',
+                    text: 'Gagal memuatkan maklumat masjid.',
+                    icon: 'error'
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchInitialData();
+    }, []);
 
     const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -125,6 +162,14 @@ export default function MosqueProfilePage() {
             setIsSaving(false);
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex h-full items-center justify-center bg-background-dark">
+                <IconLoader2 className="animate-spin text-primary" size={48} />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col h-full bg-background-dark">
