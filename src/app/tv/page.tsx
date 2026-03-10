@@ -52,7 +52,7 @@ export default function TVPage() {
 
   // Fetch real prayer times, announcements, and settings
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [hadith, setHadith] = useState({ content: "The best among you are those who have the best manners and character.", source: "Sahih Bukhari" });
+  const [hadiths, setHadiths] = useState<{ content: string; source: string }[]>([]);
   const [tickerItems, setTickerItems] = useState<string[]>([]);
 
   const refreshData = useCallback(async () => {
@@ -77,7 +77,13 @@ export default function TVPage() {
         .select('*');
 
       settingsData?.forEach(item => {
-        if (item.key === 'hadith') setHadith(item.value);
+        if (item.key === 'hadith') {
+          if (Array.isArray(item.value)) {
+            setHadiths(item.value);
+          } else if (item.value && item.value.content) {
+            setHadiths([item.value]);
+          }
+        }
         if (item.key === 'tv_ticker') setTickerItems(item.value);
       });
 
@@ -550,14 +556,29 @@ export default function TVPage() {
                     the Day
                   </span>
                 </div>
-                <div>
-                  <p className="text-xl text-slate-200 font-serif italic leading-relaxed">
-                    "{hadith.content}"
-                  </p>
-                  <p className="text-primary/70 text-sm mt-2 font-medium uppercase tracking-wide">
-                    — {hadith.source}
-                  </p>
-                </div>
+                {hadiths.length > 0 ? (() => {
+                  const todayIndex = new Date().getDate() % hadiths.length;
+                  const selectedHadith = hadiths[todayIndex];
+                  return (
+                    <div>
+                      <p className="text-xl text-slate-200 font-serif italic leading-relaxed">
+                        "{selectedHadith.content}"
+                      </p>
+                      <p className="text-primary/70 text-sm mt-2 font-medium uppercase tracking-wide">
+                        — {selectedHadith.source}
+                      </p>
+                    </div>
+                  );
+                })() : (
+                  <div>
+                    <p className="text-xl text-slate-200 font-serif italic leading-relaxed">
+                      "Barangsiapa yang menempuh jalan untuk mencari ilmu, maka Allah akan memudahkan baginya jalan menuju surga."
+                    </p>
+                    <p className="text-primary/70 text-sm mt-2 font-medium uppercase tracking-wide">
+                      — HR. Muslim
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
