@@ -2,6 +2,7 @@
 /* Uses the JAKIM e-Solat API for Kedah zone (KDH01) */
 
 import type { PrayerTime, PrayerTimesData } from "@/types/prayer";
+import { supabase } from "@/lib/supabase";
 
 const ZONE = "KDH01"; // Alor Setar, Kedah
 const API_URL = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=today&zone=${ZONE}`;
@@ -36,7 +37,7 @@ function formatTime(timeStr: string): string {
   return `${parts[0]}:${parts[1]}`;
 }
 
-function parseHijriDate(hijriStr: string): string {
+function parseHijriDate(hijriStr: string, offset: number = 0): string {
   // hijriStr format: "1447-09-12"
   const hijriMonths = [
     "", "Muharram", "Safar", "Rabiulawal", "Rabiulakhir",
@@ -47,9 +48,26 @@ function parseHijriDate(hijriStr: string): string {
   const parts = hijriStr.split("-");
   if (parts.length !== 3) return hijriStr;
 
-  const year = parts[0];
-  const month = parseInt(parts[1], 10);
-  const day = parseInt(parts[2], 10);
+  let year = parseInt(parts[0], 10);
+  let month = parseInt(parts[1], 10);
+  let day = parseInt(parts[2], 10);
+
+  // Apply offset (simple day adjustment)
+  if (offset !== 0) {
+    day += offset;
+
+    // Very simple wrap around (assuming 30 day months for simplicity, 
+    // real Hijri months vary but this is usually enough for +/- 1 day tweaks)
+    if (day < 1) {
+      day = 29; // Assume previous month was 29 or 30, use 29 as safe fallback or better 30
+      month -= 1;
+      if (month < 1) { month = 12; year -= 1; }
+    } else if (day > 30) {
+      day = 1;
+      month += 1;
+      if (month > 12) { month = 1; year += 1; }
+    }
+  }
 
   return `${day} ${hijriMonths[month] || ""} ${year}H`;
 }
@@ -68,6 +86,22 @@ export async function fetchPrayerTimes(): Promise<PrayerTimesData> {
       throw new Error("Invalid API response");
     }
 
+    // Fetch Hijri Offset from DB
+    let hijriOffset = 0;
+    try {
+      const { data: offsetData } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'hijri_offset')
+        .maybeSingle();
+
+      if (offsetData?.value !== undefined) {
+        hijriOffset = parseInt(offsetData.value, 10) || 0;
+      }
+    } catch (e) {
+      console.error("Failed to fetch hijri_offset:", e);
+    }
+
     const todayData = data.prayerTime[0];
 
     const prayers: PrayerTime[] = [
@@ -84,7 +118,7 @@ export async function fetchPrayerTimes(): Promise<PrayerTimesData> {
 
     return {
       date: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`,
-      hijriDate: parseHijriDate(todayData.hijri),
+      hijriDate: parseHijriDate(todayData.hijri, hijriOffset),
       zone: ZONE,
       prayers,
     };

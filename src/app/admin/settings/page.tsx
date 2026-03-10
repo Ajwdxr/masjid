@@ -25,6 +25,8 @@ export default function SettingsPage() {
   const [tickerItems, setTickerItems] = useState<string[]>([]);
   const [newTicker, setNewTicker] = useState("");
 
+  const [hijriOffset, setHijriOffset] = useState<number>(0);
+
   const [tvTheme, setTvTheme] = useState({
     primaryColor: "#c8a851",
     backgroundColor: "#1e1b14",
@@ -54,6 +56,7 @@ export default function SettingsPage() {
           }
         }
         if (item.key === "tv_ticker") setTickerItems(item.value);
+        if (item.key === "hijri_offset") setHijriOffset(item.value);
         if (item.key === "tv_theme") setTvTheme(item.value);
         if (item.key === "donation_qr") setDonationQR(item.value);
       });
@@ -208,7 +211,60 @@ export default function SettingsPage() {
             </div>
           </section>
 
-          {/* 2. TV Ticker Section */}
+          {/* 2. Hijri Calendar Offset Section */}
+          <section className="bg-[#1A1A1A] border border-[#333333] rounded-xl overflow-hidden shadow-sm">
+            <div className="px-8 py-5 border-b border-[#333333] flex items-center justify-between bg-[#222222]/30">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary text-xl">event_note</span>
+                <h3 className="text-base font-medium text-slate-200 tracking-tight font-serif italic">
+                  Hijri Calendar Offset
+                </h3>
+              </div>
+              <span className="text-[10px] text-primary/60 font-bold uppercase tracking-widest">
+                Pelarasan Tarikh
+              </span>
+            </div>
+            <div className="p-8 space-y-6">
+              <div className="flex flex-col gap-4">
+                <p className="text-xs text-[#888888] leading-relaxed">
+                  Gunakan tetapan ini jika tarikh Hijri dalam aplikasi tidak bertepatan dengan pengisytiharan rasmi (cth: berbeza 1 hari).
+                </p>
+                <div className="flex items-center gap-6 bg-[#111111] p-6 rounded-xl border border-[#333333]">
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Offset Hari</span>
+                    <p className="text-[11px] text-[#555555] italic">Tukar kepada -1, 0, atau +1</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        const newOffset = (hijriOffset || 0) - 1;
+                        setHijriOffset(newOffset);
+                        saveSetting('hijri_offset', newOffset);
+                      }}
+                      className="size-10 bg-[#222222] border border-[#333333] rounded-lg flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary/50 transition-all font-bold"
+                    >
+                      -
+                    </button>
+                    <div className="w-16 h-10 bg-[#0A0A0A] border border-primary/20 rounded-lg flex items-center justify-center text-xl font-bold text-white font-mono">
+                      {hijriOffset > 0 ? `+${hijriOffset}` : hijriOffset}
+                    </div>
+                    <button
+                      onClick={() => {
+                        const newOffset = (hijriOffset || 0) + 1;
+                        setHijriOffset(newOffset);
+                        saveSetting('hijri_offset', newOffset);
+                      }}
+                      className="size-10 bg-[#222222] border border-[#333333] rounded-lg flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary/50 transition-all font-bold"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 3. TV Ticker Section */}
           <section className="bg-[#1A1A1A] border border-[#333333] rounded-xl overflow-hidden shadow-sm">
             <div className="px-8 py-5 border-b border-[#333333] flex items-center justify-between bg-[#222222]/30">
               <div className="flex items-center gap-3">

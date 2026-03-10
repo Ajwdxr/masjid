@@ -43,15 +43,18 @@ const MALAY_MONTHS = [
 /**
  * Get approximate Hijri date using Intl (built-in)
  */
-export function getHijriDate(): string {
+export function getHijriDate(offset: number = 0): string {
   try {
-    const now = new Date();
+    const date = new Date();
+    if (offset !== 0) {
+      date.setDate(date.getDate() + offset);
+    }
     const formatter = new Intl.DateTimeFormat("ms-MY-u-ca-islamic", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
-    return formatter.format(now);
+    return formatter.format(date);
   } catch {
     return "";
   }

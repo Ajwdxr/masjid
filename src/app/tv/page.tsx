@@ -54,6 +54,7 @@ export default function TVPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [hadiths, setHadiths] = useState<{ content: string; source: string }[]>([]);
   const [tickerItems, setTickerItems] = useState<string[]>([]);
+  const [hijriOffset, setHijriOffset] = useState<number>(0);
 
   const refreshData = useCallback(async () => {
     try {
@@ -85,6 +86,7 @@ export default function TVPage() {
           }
         }
         if (item.key === 'tv_ticker') setTickerItems(item.value);
+        if (item.key === 'hijri_offset') setHijriOffset(parseInt(item.value, 10) || 0);
       });
 
       setIsLoading(false);
@@ -121,18 +123,25 @@ export default function TVPage() {
         year: "numeric",
       })
     );
+  }, []);
+
+  useEffect(() => {
     try {
+      const date = new Date();
+      if (hijriOffset !== 0) {
+        date.setDate(date.getDate() + hijriOffset);
+      }
       setHijriDate(
         new Intl.DateTimeFormat("ms-MY-u-ca-islamic", {
           day: "numeric",
           month: "long",
           year: "numeric",
-        }).format(now) + "H"
+        }).format(date) + "H"
       );
     } catch {
       setHijriDate("");
     }
-  }, []);
+  }, [hijriOffset]);
 
   // Auto-refresh page every 30 seconds (for prayer time updates)
   useEffect(() => {
@@ -311,10 +320,10 @@ export default function TVPage() {
               <div className="pt-8 block">
                 <p className="text-slate-400 text-2xl tracking-[0.2em] uppercase font-semibold">
                   {transmission.type === "BEFORE"
-                    ? "Sila kosongkan saf dan matikan telefon bimbit"
+                    ? "Sila penuhkan saf dan matikan telefon bimbit"
                     : transmission.type === "AZAN"
                       ? "Jawablah laungan Azan dengan sempurna"
-                      : "Sila bersedia untuk menunaikan solat berjemaah"}
+                      : "Marilah solat berjemaah"}
                 </p>
               </div>
             </div>
