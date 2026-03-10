@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🕌 Zahir Digital - Masjid Zahir Management System
 
-## Getting Started
+**Zahir Digital** adalah sebuah platform pengurusan masjid moden yang direka khas untuk **Masjid Zahir, Alor Setar**. Sistem ini mengintegrasikan portal awam, panel pentadbiran (admin), dan paparan smart TV untuk pendigitalan pengurusan masjid secara menyeluruh.
 
-First, run the development server:
+![License](https://img.shields.io/badge/license-MIT-gold)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![Supabase](https://img.shields.io/badge/Supabase-DB%20%7C%20Auth%20%7C%20Storage-emerald)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-CSS-blue)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌟 Ciri-Ciri Utama
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 1. 📺 Smart TV Display (Digital Signage)
+Paparan khusus untuk skrin besar di ruang solat masjid:
+*   **Waktu Solat Pintar**: Kemaskini automatik dengan kiraan detik (*countdown*) ke Azan dan Iqamah.
+*   **Amaran Visual & Audio**: Bunyi amaran (beeping) dan paparan skrin penuh apabila masuk waktu solat.
+*   **Pengumuman Dinamik**: Slaid poster pengumuman dengan sistem *intelligent fitting* (tiada gambar yang terpotong).
+*   **Hadith Harian & Ticker**: Mesej bergerak (ticker) dan petikan Hadith yang boleh dikemaskini dari admin.
+*   **Responsif**: Skala automatik untuk resolusi Full HD (1920x1080).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. 🏛️ Admin Dashboard (Panel Kawalan)
+Satu pusat kawalan untuk pihak pengurusan masjid:
+*   **Analitik Real-time**: Pantauan jumlah infaq, jumlah aduan, dan status kempen aktif.
+*   **Urus Pengumuman**: Tambah/kemaskini pengumuman dengan sokongan muat naik fail atau import dari URL.
+*   **Urus Infaq & Kempen**: Cipta kempen sumbangan, pantau kutipan, dan urus rekod penderma.
+*   **Sistem Aduan**: Menerima aduan kariah (beserta bukti gambar) dan mengemaskini status penyelesaian.
+*   **Konfigurasi TV**: Tukar mesej ticker, hadith harian, dan tema warna TV secara *live*.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. 📱 Portal Awam (Kariah)
+Halaman mesra pengguna untuk jemaah:
+*   **Infaq Digital**: Pautan terus ke gerbang pembayaran atau paparan QR Code untuk sumbangan pantas.
+*   **Semakan Pengumuman**: Melihat aktiviti dan program masjid dalam bentuk kad yang cantik.
+*   **Borang Aduan**: Menghantar maklum balas atau aduan kerosakan dengan muat naik gambar bukti.
+*   **Penyemak Waktu Solat**: Jadual waktu solat harian yang tepat.
 
-## Learn More
+## � Akses Pentadbir (Demo/Admin)
 
-To learn more about Next.js, take a look at the following resources:
+Untuk mengakses panel pentadbiran (**Admin Dashboard**), sila gunakan kredential berikut:
+*   **Email**: `admin@zahir.digital`
+*   **Password**: `Admin123`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## �🛠️ Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+*   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+*   **Database & Auth**: [Supabase](https://supabase.com/)
+*   **Storage**: Supabase Bucket (untuk gambar pengumuman & aduan)
+*   **Styling**: Tailwind CSS & Framer Motion
+*   **Analytics**: Vercel Analytics
+*   **Feedback**: SweetAlert2
 
-## Deploy on Vercel
+## 🚀 Pemasangan (Local Development)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1.  **Klon repository**:
+    ```bash
+    git clone https://github.com/Ajwdxr/masjid.git
+    cd masjid
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2.  **Pasang dependencies**:
+    ```bash
+    npm install
+    ```
+
+3.  **Konfigurasi Persekitaran (.env.local)**:
+    Cipta fail `.env.local` dan masukkan kunci Supabase anda:
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
+
+4.  **Database Setup**:
+    Jalankan skrip di `supabase/full_schema.sql` di dalam SQL Editor Supabase anda.
+
+5.  **Jalankan aplikasi**:
+    ```bash
+    npm run dev
+    ```
+
+## 📸 Paparan Skrin
+*(Sila tambahkan gambar screenshot di sini)*
+
+## 📄 Lesen
+Projek ini dilesenkan di bawah Lesen MIT.
+
+---
+Dikembangkan dengan ❤️ untuk **Kariah Masjid Zahir**.
