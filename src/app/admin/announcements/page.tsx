@@ -169,29 +169,36 @@ export default function AdminAnnouncementsPage() {
               style={{ animationDelay: `${index * 0.05}s` } as React.CSSProperties}
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-light text-sm">
-                      {item.title}
-                    </h3>
-                    {item.is_active ? (
-                      <Badge variant="emerald">Aktif</Badge>
-                    ) : (
-                      <Badge variant="muted">Tidak aktif</Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-light-muted line-clamp-2">
-                    {item.description}
-                  </p>
-                  <div className="flex items-center gap-3 mt-2">
-                    {item.event_date && (
-                      <span className="text-xs text-gold">
-                        <IconCalendar size={12} className="inline mr-1" /> {formatShortDate(item.event_date)}
+                <div className="flex items-start gap-4 flex-1 min-w-0">
+                  {item.image_url && (
+                    <div className="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-dark-surface border border-dark-border">
+                      <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-light text-sm">
+                        {item.title}
+                      </h3>
+                      {item.is_active ? (
+                        <Badge variant="emerald">Aktif</Badge>
+                      ) : (
+                        <Badge variant="muted">Tidak aktif</Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-light-muted line-clamp-2">
+                      {item.description}
+                    </p>
+                    <div className="flex items-center gap-3 mt-2">
+                      {item.event_date && (
+                        <span className="text-xs text-gold">
+                          <IconCalendar size={12} className="inline mr-1" /> {formatShortDate(item.event_date)}
+                        </span>
+                      )}
+                      <span className="text-xs text-light-muted">
+                        Ditambah: {formatShortDate(item.created_at)}
                       </span>
-                    )}
-                    <span className="text-xs text-light-muted">
-                      Ditambah: {formatShortDate(item.created_at)}
-                    </span>
+                    </div>
                   </div>
                 </div>
 
