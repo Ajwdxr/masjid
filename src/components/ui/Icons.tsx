@@ -28,6 +28,14 @@ function wrap(children: React.ReactNode, { size = 20, className = "" }: IconProp
 }
 
 /* ─── Navigation & General ─── */
+export const IconLoader2 = (props: IconProps) =>
+  wrap(
+    <>
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </>,
+    props
+  );
+
 export const IconMosque = (props: IconProps) =>
   wrap(
     <>

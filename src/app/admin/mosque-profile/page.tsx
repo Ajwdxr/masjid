@@ -12,9 +12,13 @@ import {
     IconPlus,
     IconTrash,
     IconEdit,
-    IconCheck
+    IconCheck,
+    IconLoader2
 } from "@/components/ui/Icons";
 import type { MosqueProfile, MosqueFacility, FacilityStatus } from "@/types/mosque";
+import { uploadImage } from "@/lib/upload";
+import { supabase } from "@/lib/supabase";
+import Swal from "sweetalert2";
 
 export default function MosqueProfilePage() {
     // Mock State
@@ -37,6 +41,8 @@ export default function MosqueProfilePage() {
         { id: "1", mosque_id: "1", name: "Parking", description: "Kawasan letak kereta luas", availability_status: "available", icon_name: "car_repair", created_at: "", updated_at: "" },
         { id: "2", mosque_id: "1", name: "WiFi", description: "Percuma untuk jemaah", availability_status: "available", icon_name: "wifi", created_at: "", updated_at: "" },
     ]);
+    const [isUploading, setIsUploading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -45,6 +51,79 @@ export default function MosqueProfilePage() {
 
     const handleFacilityStatusChange = (id: string, status: FacilityStatus) => {
         setFacilities(prev => prev.map(f => f.id === id ? { ...f, availability_status: status } : f));
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Basic validation
+        if (!file.type.startsWith('image/')) {
+            Swal.fire({ title: 'Ralat', text: 'Sila pilih fail imej sahaja.', icon: 'error' });
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const url = await uploadImage(file, 'images', 'mosque-hero');
+            setProfile(prev => ({ ...prev, hero_image_url: url }));
+
+            Swal.fire({
+                title: 'Berjaya!',
+                text: 'Imej telah berjaya dimuat naik.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (error: any) {
+            console.error('Upload error:', error);
+            Swal.fire({
+                title: 'Gagal',
+                text: error.message || 'Gagal memuat naik imej.',
+                icon: 'error'
+            });
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            // Updated to be real integration later, but for now we simulate
+            const { error } = await supabase
+                .from('mosque_profiles')
+                .update({
+                    name: profile.name,
+                    address: profile.address,
+                    phone: profile.phone,
+                    description: profile.description,
+                    hero_image_url: profile.hero_image_url,
+                    parking_capacity: profile.parking_capacity,
+                    parking_available: profile.parking_available,
+                    parking_notes: profile.parking_notes,
+                    google_map_embed_url: profile.google_map_embed_url
+                })
+                .eq('id', profile.id);
+
+            if (error) throw error;
+
+            Swal.fire({
+                title: 'Tersimpan!',
+                text: 'Maklumat masjid telah berjaya dikemaskini.',
+                icon: 'success',
+                confirmButtonColor: '#D4AF37'
+            });
+        } catch (error: any) {
+            console.error('Save error:', error);
+            Swal.fire({
+                title: 'Ralat',
+                text: error.message || 'Gagal menyimpan maklumat.',
+                icon: 'error'
+            });
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -64,9 +143,15 @@ export default function MosqueProfilePage() {
                     <Button variant="outline" size="sm" className="hidden sm:flex">
                         View Public Page
                     </Button>
-                    <Button variant="primary" size="sm" className="gap-2">
-                        <IconCheck size={18} />
-                        Save Changes
+                    <Button
+                        variant="primary"
+                        size="sm"
+                        className="gap-2"
+                        onClick={handleSave}
+                        disabled={isSaving}
+                    >
+                        {isSaving ? <IconLoader2 className="animate-spin" size={18} /> : <IconCheck size={18} />}
+                        {isSaving ? 'Saving...' : 'Save Changes'}
                     </Button>
                 </div>
             </header>
@@ -201,18 +286,41 @@ export default function MosqueProfilePage() {
                             <Card className="bg-surface-dark border-[#3a3528] p-6 space-y-4">
                                 <h3 className="text-sm font-bold text-white uppercase tracking-widest text-center">Hero Image</h3>
                                 <div className="aspect-[16/10] bg-background-dark rounded-xl border border-dashed border-[#3a3528] relative overflow-hidden group">
+                                    <input
+                                        type="file"
+                                        id="hero-upload"
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                        disabled={isUploading}
+                                    />
+                                    {isUploading ? (
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 z-20">
+                                            <IconLoader2 className="animate-spin text-primary" size={32} />
+                                            <span className="text-[10px] text-primary mt-2 uppercase tracking-widest font-bold">Uploading...</span>
+                                        </div>
+                                    ) : null}
+
                                     {profile.hero_image_url ? (
                                         <>
                                             <img src={profile.hero_image_url} alt="Hero" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" />
                                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-                                                <Button variant="outline" size="sm" className="bg-white/10 backdrop-blur-md border-white/20">Change Image</Button>
+                                                <label
+                                                    htmlFor="hero-upload"
+                                                    className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-lg text-white text-xs font-bold cursor-pointer hover:bg-white/20 transition-all"
+                                                >
+                                                    Change Image
+                                                </label>
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-text-admin-muted gap-2">
+                                        <label
+                                            htmlFor="hero-upload"
+                                            className="absolute inset-0 flex flex-col items-center justify-center text-text-admin-muted gap-2 cursor-pointer hover:bg-white/5 transition-all"
+                                        >
                                             <IconImage size={32} />
                                             <span className="text-[10px]">Click to upload</span>
-                                        </div>
+                                        </label>
                                     )}
                                 </div>
                                 <p className="text-[10px] text-text-admin-muted text-center italic">Best resolution: 1600x900px</p>
