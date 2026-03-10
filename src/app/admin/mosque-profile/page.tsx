@@ -92,7 +92,7 @@ export default function MosqueProfilePage() {
         try {
             // Updated to be real integration later, but for now we simulate
             const { error } = await supabase
-                .from('mosque_profiles')
+                .from('mosque_profile')
                 .update({
                     name: profile.name,
                     address: profile.address,
