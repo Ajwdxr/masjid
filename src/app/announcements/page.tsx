@@ -1,78 +1,24 @@
 import type { Metadata } from "next";
 import { AnnouncementList } from "@/components/announcements/AnnouncementList";
-import { IconMegaphone } from "@/components/ui/Icons";
+import { IconMegaphone, IconLoader2 } from "@/components/ui/Icons";
 import type { Announcement } from "@/types/announcement";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Pengumuman",
   description: "Senarai pengumuman terkini Masjid Zahir, Alor Setar.",
 };
 
-/* ─── Mock data (will be replaced by Supabase) ─── */
-const mockAnnouncements: Announcement[] = [
-  {
-    id: "1",
-    title: "Ceramah Khas Ramadan",
-    description:
-      "Ceramah khas sempena bulan Ramadan bersama Ustaz Ahmad bin Abdullah. Semua jemaah dijemput hadir selepas solat Isyak di dewan utama masjid. Tajuk ceramah: 'Menghidupkan Malam Ramadan'.",
-    image_url: null,
-    event_date: "2026-03-15",
-    is_active: true,
-    created_at: "2026-03-01",
-  },
-  {
-    id: "2",
-    title: "Program Tadarus Al-Quran",
-    description:
-      "Program tadarus Al-Quran sepanjang bulan Ramadan bermula selepas solat Subuh hingga Syuruk setiap hari. Semua lapisan masyarakat dijemput untuk menyertai program ini.",
-    image_url: null,
-    event_date: "2026-03-05",
-    is_active: true,
-    created_at: "2026-03-01",
-  },
-  {
-    id: "3",
-    title: "Gotong-Royong Masjid",
-    description:
-      "Gotong-royong pembersihan dan penyelenggaraan masjid. Semua sukarelawan dijemput hadir dari jam 8 pagi. Peralatan pembersihan akan disediakan. Sarapan pagi disediakan untuk semua peserta.",
-    image_url: null,
-    event_date: "2026-03-10",
-    is_active: true,
-    created_at: "2026-02-28",
-  },
-  {
-    id: "4",
-    title: "Kursus Pengurusan Jenazah",
-    description:
-      "Kursus pengurusan jenazah untuk ahli kariah dan masyarakat umum. Kursus ini meliputi teori dan amali pengurusan jenazah mengikut syariah. Yuran pendaftaran percuma.",
-    image_url: null,
-    event_date: "2026-03-20",
-    is_active: true,
-    created_at: "2026-02-25",
-  },
-  {
-    id: "5",
-    title: "Majlis Iftar Perdana",
-    description:
-      "Majlis iftar perdana bersama YB Dato' Menteri Besar Kedah dan barisan pentadbir masjid. Jemputan terbuka kepada semua jemaah tetap Masjid Zahir.",
-    image_url: null,
-    event_date: "2026-03-12",
-    is_active: true,
-    created_at: "2026-02-22",
-  },
-  {
-    id: "6",
-    title: "Penyelenggaraan Penghawa Dingin",
-    description:
-      "Penyelenggaraan berkala sistem penghawa dingin masjid akan dijalankan. Sedikit ketidakselesaan mungkin dialami semasa kerja-kerja penyelenggaraan.",
-    image_url: null,
-    event_date: "2026-02-20",
-    is_active: false,
-    created_at: "2026-02-15",
-  },
-];
+export default async function AnnouncementsPage() {
+  const supabase = await createClient();
 
-export default function AnnouncementsPage() {
+  const { data, error } = await supabase
+    .from('announcements')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  const announcements: Announcement[] = data || [];
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       {/* Header */}
@@ -87,7 +33,14 @@ export default function AnnouncementsPage() {
       </div>
 
       {/* Announcements List */}
-      <AnnouncementList announcements={mockAnnouncements} />
+      {announcements.length > 0 ? (
+        <AnnouncementList announcements={announcements} />
+      ) : (
+        <div className="text-center py-20 space-y-4">
+          <IconMegaphone size={48} className="text-gold/20 mx-auto" />
+          <p className="text-light-muted italic">Tiada pengumuman buat masa ini.</p>
+        </div>
+      )}
     </div>
   );
 }

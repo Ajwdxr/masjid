@@ -6,60 +6,23 @@ import { usePrayerCountdown } from "@/hooks/usePrayerTimes";
 import type { PrayerTime } from "@/types/prayer";
 import type { Announcement } from "@/types/announcement";
 import { fetchPrayerTimes } from "@/lib/prayer-times";
+import { supabase } from "@/lib/supabase";
 
 /* ─── Mock data (will be replaced by Supabase + API fetch) ─── */
-const mockPrayers: PrayerTime[] = [
-  { name: "Imsak", nameMs: "Imsak", time: "05:52" },
-  { name: "Fajr", nameMs: "Subuh", time: "06:02" },
-  { name: "Syuruk", nameMs: "Syuruk", time: "07:17" },
-  { name: "Dhuhr", nameMs: "Zohor", time: "13:23" },
-  { name: "Asr", nameMs: "Asar", time: "16:38" },
-  { name: "Maghrib", nameMs: "Maghrib", time: "19:22" },
-  { name: "Isha", nameMs: "Isyak", time: "20:34" },
-];
-
-const mockAnnouncements: Announcement[] = [
-  {
-    id: "1",
-    title: "Ceramah Khas Ramadan",
-    description: "Ceramah khas sempena bulan Ramadan bersama Ustaz Ahmad bin Abdullah. Semua jemaah dijemput hadir selepas solat Isyak.",
-    image_url: null,
-    event_date: "2026-03-15",
-    is_active: true,
-    created_at: "2026-03-01",
-  },
-  {
-    id: "2",
-    title: "Program Tadarus Al-Quran",
-    description: "Program tadarus Al-Quran sepanjang bulan Ramadan bermula selepas solat Subuh hingga Syuruk setiap hari.",
-    image_url: null,
-    event_date: "2026-03-05",
-    is_active: true,
-    created_at: "2026-03-01",
-  },
-  {
-    id: "3",
-    title: "Gotong-Royong Masjid",
-    description: "Gotong-royong pembersihan dan penyelenggaraan masjid. Semua sukarelawan dijemput hadir dari jam 8 pagi.",
-    image_url: null,
-    event_date: "2026-03-10",
-    is_active: true,
-    created_at: "2026-02-28",
-  },
-  {
-    id: "4",
-    title: "Majlis Iftar Perdana",
-    description: "Majlis iftar perdana bersama YB Dato' Menteri Besar Kedah dan barisan pentadbir masjid.",
-    image_url: null,
-    event_date: "2026-03-12",
-    is_active: true,
-    created_at: "2026-02-22",
-  },
-];
+// Mock / Initial empty state for announcements if none fetched
+const defaultAnnouncement: Announcement = {
+  id: "0",
+  title: "Selamat Datang ke Masjid Zahir",
+  description: "Semoga kehadiran anda diberkati Allah SWT. Sila pastikan telefon bimbit dimatikan.",
+  image_url: null,
+  event_date: null,
+  is_active: true,
+  created_at: new Date().toISOString(),
+};
 
 export default function TVPage() {
   const { formattedTime } = useLiveClock();
-  const [prayers, setPrayers] = useState<PrayerTime[]>(mockPrayers);
+  const [prayers, setPrayers] = useState<PrayerTime[]>([]);
   const { nextPrayer, countdown } = usePrayerCountdown(prayers);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [hijriDate, setHijriDate] = useState("");
@@ -87,33 +50,47 @@ export default function TVPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Fetch real prayer times
-  const refreshPrayers = useCallback(async () => {
+  // Fetch real prayer times and announcements
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+
+  const refreshData = useCallback(async () => {
     try {
+      // Fetch prayers
       const data = await fetchPrayerTimes();
       setPrayers(data.prayers);
       if (data.hijriDate) setHijriDate(data.hijriDate);
+
+      // Fetch announcements
+      const { data: annData } = await supabase
+        .from('announcements')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (annData) setAnnouncements(annData as Announcement[]);
+
       setIsLoading(false);
     } catch (error) {
-      console.error("Failed to fetch prayers:", error);
+      console.error("Failed to fetch data:", error);
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    refreshPrayers();
+    refreshData();
     // Refresh every hour
-    const interval = setInterval(refreshPrayers, 3600000);
+    const interval = setInterval(refreshData, 3600000);
     return () => clearInterval(interval);
-  }, [refreshPrayers]);
+  }, [refreshData]);
 
   // Rotate announcements every 8 seconds
   useEffect(() => {
+    if (announcements.length <= 1) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % mockAnnouncements.length);
+      setCurrentSlide((prev) => (prev + 1) % announcements.length);
     }, 8000);
     return () => clearInterval(interval);
-  }, []);
+  }, [announcements.length]);
 
   // Set dates on client
   useEffect(() => {
@@ -229,7 +206,7 @@ export default function TVPage() {
   }, [transmission?.type, transmission?.remaining]);
 
   const displayPrayers = prayers.filter((p: PrayerTime) => p.name !== "Imsak");
-  const currentAnn = mockAnnouncements[currentSlide];
+  const currentAnn = announcements[currentSlide] || defaultAnnouncement;
 
   return (
     <div className="fixed inset-0 bg-background-dark overflow-hidden z-[100]">
@@ -434,10 +411,10 @@ export default function TVPage() {
                   <div
                     key={prayer.name}
                     className={`flex justify-between items-center px-6 py-4 border-b border-white/5 transition-all duration-500 ${isActive
-                        ? "bg-gradient-to-r from-primary to-[#bfa140] text-black shadow-lg shadow-black/50 relative my-1 transform scale-105 z-10"
-                        : i % 2 === 0
-                          ? ""
-                          : "bg-white/[0.02]"
+                      ? "bg-gradient-to-r from-primary to-[#bfa140] text-black shadow-lg shadow-black/50 relative my-1 transform scale-105 z-10"
+                      : i % 2 === 0
+                        ? ""
+                        : "bg-white/[0.02]"
                       }`}
                   >
                     {isActive && (
@@ -445,8 +422,8 @@ export default function TVPage() {
                     )}
                     <span
                       className={`${isActive
-                          ? "font-bold text-xl"
-                          : "text-slate-400 text-lg font-light"
+                        ? "font-bold text-xl"
+                        : "text-slate-400 text-lg font-light"
                         } uppercase tracking-widest`}
                     >
                       {prayer.nameMs}
