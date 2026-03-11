@@ -119,6 +119,13 @@ CREATE TABLE IF NOT EXISTS user_deed_logs (
     UNIQUE(user_id, task_id, completed_at)
 );
 
+-- 10) Settings (Key-Value Store for app config)
+CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ─── FUNCTIONS & TRIGGERS ───
 
 -- Function to handle updated_at
@@ -150,6 +157,7 @@ ALTER TABLE complaints ENABLE ROW LEVEL SECURITY;
 ALTER TABLE donations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE task_definitions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_deed_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 
 -- Public Read Access
 CREATE POLICY "Public Read Mosque Profile" ON mosque_profile FOR SELECT USING (true);
@@ -157,6 +165,7 @@ CREATE POLICY "Public Read Mosque Facilities" ON mosque_facilities FOR SELECT US
 CREATE POLICY "Public Read Announcements" ON announcements FOR SELECT USING (true);
 CREATE POLICY "Public Read Campaigns" ON campaigns FOR SELECT USING (true);
 CREATE POLICY "Public Read Task Definitions" ON task_definitions FOR SELECT USING (true);
+CREATE POLICY "Public Read Settings" ON settings FOR SELECT USING (true);
 
 -- Profiles RLS
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
@@ -184,6 +193,7 @@ CREATE POLICY "Admin CRUD Campaigns" ON campaigns FOR ALL USING (EXISTS (SELECT 
 CREATE POLICY "Admin CRUD Complaints" ON complaints FOR ALL USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
 CREATE POLICY "Admin CRUD Donations" ON donations FOR ALL USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
 CREATE POLICY "Admin CRUD Task Definitions" ON task_definitions FOR ALL USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
+CREATE POLICY "Admin CRUD Settings" ON settings FOR ALL USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
 
 -- ─── ADVANCED TRIGGERS ───
 

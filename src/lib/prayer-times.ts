@@ -5,7 +5,7 @@ import type { PrayerTime, PrayerTimesData } from "@/types/prayer";
 import { supabase } from "@/lib/supabase";
 
 const ZONE = "KDH01"; // Alor Setar, Kedah
-const API_URL = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=today&zone=${ZONE}`;
+const API_URL = `https://api.waktusolat.app/solat/${ZONE}`;
 
 interface ESolatPrayer {
   hijri: string;
