@@ -4,17 +4,23 @@
 import type { PrayerTime, PrayerTimesData } from "@/types/prayer";
 import { supabase } from "@/lib/supabase";
 
+/**
+ * Get the current day of the month
+ */
+function getCurrentDayOfMonth(): number {
+  return new Date().getDate();
+}
+
 const ZONE = "KDH01"; // Alor Setar, Kedah
-const API_URL = `https://api.waktusolat.app/solat/${ZONE}`;
 
 interface ESolatPrayer {
   hijri: string;
   date: string;
   day: string;
-  imsak: string;
+  imsak?: string; // May be missing in some endpoints
   fajr: string;
   syuruk: string;
-  dhuha: string;
+  dhuha?: string;
   dhuhr: string;
   asr: string;
   maghrib: string;
@@ -22,7 +28,7 @@ interface ESolatPrayer {
 }
 
 interface ESolatResponse {
-  prayerTime: ESolatPrayer[];
+  prayerTime: ESolatPrayer | ESolatPrayer[]; // Can be object or array
   status: string;
   serverTime: string;
   periodType: string;
@@ -33,8 +39,19 @@ interface ESolatResponse {
 
 /** Convert "HH:MM:SS" to "HH:MM" */
 function formatTime(timeStr: string): string {
+  if (!timeStr) return "--:--";
   const parts = timeStr.split(":");
   return `${parts[0]}:${parts[1]}`;
+}
+
+/** 
+ * Calculate Imsak if missing (Usually 10 minutes before Fajr/Subuh)
+ */
+function calculateImsak(fajrTime: string): string {
+  const [h, m, s] = fajrTime.split(":").map(Number);
+  const date = new Date();
+  date.setHours(h, m - 10, s || 0);
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:00`;
 }
 
 function parseHijriDate(hijriStr: string, offset: number = 0): string {
@@ -56,10 +73,9 @@ function parseHijriDate(hijriStr: string, offset: number = 0): string {
   if (offset !== 0) {
     day += offset;
 
-    // Very simple wrap around (assuming 30 day months for simplicity, 
-    // real Hijri months vary but this is usually enough for +/- 1 day tweaks)
+    // Very simple wrap around
     if (day < 1) {
-      day = 29; // Assume previous month was 29 or 30, use 29 as safe fallback or better 30
+      day = 29;
       month -= 1;
       if (month < 1) { month = 12; year -= 1; }
     } else if (day > 30) {
@@ -73,8 +89,11 @@ function parseHijriDate(hijriStr: string, offset: number = 0): string {
 }
 
 export async function fetchPrayerTimes(): Promise<PrayerTimesData> {
+  const currentDay = getCurrentDayOfMonth();
+  const api_url = `https://api.waktusolat.app/solat/${ZONE}/${currentDay}`;
+
   try {
-    const res = await fetch(API_URL, { next: { revalidate: 3600 } });
+    const res = await fetch(api_url, { next: { revalidate: 3600 } });
 
     if (!res.ok) {
       throw new Error(`API error: ${res.status}`);
@@ -82,9 +101,17 @@ export async function fetchPrayerTimes(): Promise<PrayerTimesData> {
 
     const data: ESolatResponse = await res.json();
 
-    if (data.status !== "OK!" || !data.prayerTime?.length) {
+    if (data.status !== "OK!" || !data.prayerTime) {
       throw new Error("Invalid API response");
     }
+
+    // Handle both object (single day) and array (multiple days)
+    const todayData = Array.isArray(data.prayerTime)
+      ? data.prayerTime[0]
+      : data.prayerTime;
+
+    // Calculate Imsak if missing
+    const imsakTime = todayData.imsak || calculateImsak(todayData.fajr);
 
     // Fetch Hijri Offset from DB
     let hijriOffset = 0;
@@ -102,10 +129,8 @@ export async function fetchPrayerTimes(): Promise<PrayerTimesData> {
       console.error("Failed to fetch hijri_offset:", e);
     }
 
-    const todayData = data.prayerTime[0];
-
     const prayers: PrayerTime[] = [
-      { name: "Imsak", nameMs: "Imsak", time: formatTime(todayData.imsak) },
+      { name: "Imsak", nameMs: "Imsak", time: formatTime(imsakTime) },
       { name: "Fajr", nameMs: "Subuh", time: formatTime(todayData.fajr) },
       { name: "Syuruk", nameMs: "Syuruk", time: formatTime(todayData.syuruk) },
       { name: "Dhuhr", nameMs: "Zohor", time: formatTime(todayData.dhuhr) },
@@ -135,13 +160,13 @@ function getDefaultPrayerTimes(): PrayerTimesData {
     hijriDate: "",
     zone: ZONE,
     prayers: [
-      { name: "Imsak", nameMs: "Imsak", time: "06:12" },
-      { name: "Fajr", nameMs: "Subuh", time: "06:22" },
-      { name: "Syuruk", nameMs: "Syuruk", time: "07:29" },
-      { name: "Dhuhr", nameMs: "Zohor", time: "13:33" },
-      { name: "Asr", nameMs: "Asar", time: "16:50" },
+      { name: "Imsak", nameMs: "Imsak", time: "06:09" },
+      { name: "Fajr", nameMs: "Subuh", time: "06:19" },
+      { name: "Syuruk", nameMs: "Syuruk", time: "07:25" },
+      { name: "Dhuhr", nameMs: "Zohor", time: "13:31" },
+      { name: "Asr", nameMs: "Asar", time: "16:45" },
       { name: "Maghrib", nameMs: "Maghrib", time: "19:32" },
-      { name: "Isha", nameMs: "Isyak", time: "20:42" },
+      { name: "Isha", nameMs: "Isyak", time: "20:41" },
     ],
   };
 }
